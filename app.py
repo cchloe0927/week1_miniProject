@@ -14,7 +14,7 @@ app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
 SECRET_KEY = 'SPARTA'
 
 client = MongoClient('localhost', 27017)
-db = client.dbsparta_plus_week4
+db = client.dbsparta_week1
 
 
 @app.route('/')
@@ -24,6 +24,7 @@ def home():
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.users.find_one({"username": payload["id"]})
         return render_template('index.html', user_info=user_info)
+
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
     except jwt.exceptions.DecodeError:
@@ -36,6 +37,7 @@ def login():
     return render_template('login.html', msg=msg)
 
 
+####유저네임을 통해서 프로필 페이지 보여주기(/user)######
 @app.route('/user/<username>')
 def user(username):
     # 각 사용자의 프로필과 글을 모아볼 수 있는 공간
@@ -71,6 +73,7 @@ def sign_in():
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
+
 @app.route('/sign_up/save', methods=['POST'])
 def sign_up():
     username_receive = request.form['username_give']
@@ -87,33 +90,36 @@ def sign_up():
     db.users.insert_one(doc)
     return jsonify({'result': 'success'})
 
+
 @app.route('/sign_up/check_dup', methods=['POST'])
 def check_dup():
     username_receive = request.form['username_give']
     exists = bool(db.users.find_one({"username": username_receive}))
     return jsonify({'result': 'success', 'exists': exists})
 
+
+#####프로필페이지에서 프로필 사진업로드(/user)######
 @app.route('/update_profile', methods=['POST'])
 def save_img():
-    token_receive = request.cookies.get('mytoken')#본인 토큰 받아서
+    token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        username = payload["id"]#id 받아오고
-        name_receive = request.form["name_give"]#닉네임 받아오고
-        about_receive = request.form["about_give"]# 자기소개 받아와서
+        username = payload["id"]
+        name_receive = request.form["name_give"]
+        about_receive = request.form["about_give"]
         new_doc = {
             "profile_name": name_receive,
             "profile_info": about_receive
         }
-        if 'file_give' in request.files:#만약 유저가 파일을 보냈다면
+        if 'file_give' in request.files:
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
             file_path = f"profile_pics/{username}.{extension}"
-            file.save("./static/"+file_path)#static폴더에 사진을 저장하고
+            file.save("./static/"+file_path)
             new_doc["profile_pic"] = filename
             new_doc["profile_pic_real"] = file_path
-        db.users.update_one({'username': payload['id']}, {'$set':new_doc})#해당 유저이름으로 업데이트
+        db.users.update_one({'username': payload['id']}, {'$set':new_doc})
         return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
