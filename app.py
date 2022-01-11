@@ -74,11 +74,8 @@ def sign_in():
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
 
-
 @app.route('/sign_up/save', methods=['POST'])
 def sign_up():
-    new_user = request.json
-    new_user['password'] = bcrypt.hashpw(new_user['password'].encode('UTF-8'), bycrypt.gensalt())
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
     password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
@@ -101,7 +98,6 @@ def check_dup():
     return jsonify({'result': 'success', 'exists': exists})
 
 
-
 #####프로필페이지에서 프로필 사진업로드(/user)######
 @app.route('/update_profile', methods=['POST'])
 def save_img():
@@ -112,18 +108,16 @@ def save_img():
         name_receive = request.form["name_give"]
         about_receive = request.form["about_give"]
 
-
         if 'file_give' in request.files:
-
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
             file_path = f"profile_pics/{username}.{extension}"
 
-            file.save("./static/"+file_path)
+            file.save("./static/" + file_path)
             new_doc["profile_pic"] = filename
             new_doc["profile_pic_real"] = file_path
-        db.users.update_one({'username': payload['id']}, {'$set':new_doc})
+        db.users.update_one({'username': payload['id']}, {'$set': new_doc})
 
         return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -205,6 +199,7 @@ def update_like():
         return jsonify({"result": "success", 'msg': 'updated', "count": count})  # 클라이언트로 넘겨줌
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
+
 
 # 게시물 상세페이지 보여주기
 @app.route('/pic_detail', methods=['GET'])
