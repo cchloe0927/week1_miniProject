@@ -127,11 +127,12 @@
                             let post = posts[i]
                             let html_temp = `<div class="card is-variable is-1-mobile is-0-tablet is-3-desktop is-8-widescreen is-2-fullhd">
                                                 <div class="card" onclick="this_post()">
-                                                            <img src="${post['place_pic']}">
+                                                            <img src="../static/place_pic/${username}.{mytime}.{extension}'">
                                                 </div>
                                             </div>`
-                            console.log(html_temp)
+
                             $("#post-box").append(html_temp)
+                            console.log(html_temp)
                         }
                     }
                 }
@@ -140,7 +141,6 @@
         function this_post() {
             location.href="/"
         }
-
     </script>
 </head>
 
