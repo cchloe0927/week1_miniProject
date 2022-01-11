@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import bcrypt
 
+
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
@@ -108,7 +109,10 @@ def save_img():
         name_receive = request.form["name_give"]
         about_receive = request.form["about_give"]
 
-        new_doc = {"profile_name": name_receive, "profile_info": about_receive}
+        new_doc = {
+            "profile_name": name_receive,
+            "profile_info" : about_receive
+        }
 
         if 'file_give' in request.files:
             file = request.files["file_give"]
@@ -126,6 +130,7 @@ def save_img():
         return redirect(url_for("home"))
 
 
+#게시물 포스팅
 @app.route('/posting', methods=['POST'])
 def posting():
     token_receive = request.cookies.get('mytoken')
@@ -141,12 +146,20 @@ def posting():
 
         filename = f'file_{username}'
         save_to = f'static/{username}.{extension}'
+        extension = place_pic.filename.split('.')[-1]
+
+        today = datetime.now()
+        mytime = today.strftime('%Y%m%d%H%M%S')
+
+        picname = f'place_pic-{mytime}'
+        save_to = f'static/place_pic/{picname}.{extension}'
         place_pic.save(save_to)
 
         doc = {
             "username": user_info["username"],
             "contents": contents_receive,
             'place_pic': f'{username}.{extension}'
+            'place_pic': f'{picname}.{extension}'
         }
 
         db.posts.insert_one(doc)
@@ -155,6 +168,7 @@ def posting():
         return redirect(url_for("home"))
 
 
+#게시물 가져오기
 @app.route("/get_posts", methods=['GET'])
 def get_posts():
     token_receive = request.cookies.get('mytoken')
@@ -210,6 +224,11 @@ def showing():
 
     return render_template("detail.html", post=post)
 
+# 전체게시물 보여주기
+@app.route('/listing', methods=['GET'])
+def listing():
+    posts = list(db.posts.find({},{'_id':False}))
+    return jsonify({'posts':posts})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
