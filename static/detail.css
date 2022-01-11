@@ -1,0 +1,35 @@
+* {
+    font-family: 'Nanum Gothic', sans-serif;
+    font-family: 'Sunflower', sans-serif;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+}
+.wrapper {
+    flex: 1;
+}
+.level {
+    margin: 20px 40px;
+}
+
+.level-left span{
+    font-size: 25px;
+}
+
+img {
+    border: 1px solid black;
+    width: 800px;
+    height: 600px;
+}
+section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.show_like {
+    margin-top: 20px;
+}
+
