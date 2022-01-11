@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b629c29f-3427-41f8-939b-2249a1f0c68e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/static/place_pic/place_pic-20220112000351.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/place_pic/place_pic-20220112000413.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/profile_pics/1234asdf.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/6prac.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/6prac.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/ccy2022.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -93,7 +87,7 @@
       <option name="presentableId" value="Default" />
       <updated>1641897787565</updated>
       <workItem from="1641897790161" duration="6336000" />
-      <workItem from="1641908184231" duration="5803000" />
+      <workItem from="1641908184231" duration="6879000" />
     </task>
     <servers />
   </component>
@@ -101,6 +95,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/week1_miniProject$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1641910471494" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/week1_miniProject$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1641915292279" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

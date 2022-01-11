@@ -158,7 +158,7 @@ def posting():
         doc = {
             "username": user_info["username"],
             "contents": contents_receive,
-            'place_pic': f'{username}.{extension}'
+            'place_pic': f'{username}.{extension}',
             'place_pic': f'{picname}.{extension}'
         }
 
