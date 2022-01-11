@@ -65,10 +65,6 @@
             margin-top: 50px;
         }
 
-        .container {
-            width: 100%;
-        }
-
         .navbar {
             height: 100px;
         }
@@ -80,7 +76,8 @@
 
         $(document).ready(function () {
             bsCustomFileInput.init()
-            get_posts()
+            listing()
+
         })
 
         function sign_out() {//로그아웃 버튼을 누르면
@@ -112,45 +109,41 @@
             });
         }
 
-        function get_posts(username) {
-            if (username == undefined) {
-                username = ""
-            }
-            $("#post-box").empty()//포스트박스 비우기
-            $.ajax({
-                type: "GET",
-                url: `/get_posts?username_give=${username}`, //username을 서버로 보내줌
-                data: {},
-                success: function (response) {
-                    if (response["result"] == "success") {
-                        let posts = response["posts"]
-                        for (let i = 0; i < posts.length; i++) {
-                            let post = posts[i]
-                            let html_temp = `<div class="card is-variable is-1-mobile is-0-tablet is-3-desktop is-8-widescreen is-2-fullhd">
-                                                <div class="card" onclick="this_post()">
-                                                            <img src="${post['place_pic']}">
-                                                </div>
-                                            </div>`
-                            console.log(html_temp)
-                            $("#post-box").append(html_temp)
-                        }
-                    }
-                }
-            })
-        }
+        $(document).ready(function () {
+            listing()
+        })
 
-
-        function this_post() {
+        function this_post() { //디테일로 이동하는 함수
             location.href = "/"
         }
 
-        $("#post-box").append(html_temp)
+
+        function listing() { //전체게시물 보여주기
+
+            $.ajax({
+                type: "GET",
+                url: "/listing",
+                data: {},
+                success: function (response) {
+                    let posts = response['posts']
+                    for (let i = 0; i < posts.length; i++) {
+                        {#let username = posts[i]['username']#}
+                        let place_pic = posts[i]['place_pic']
+
+                        let temp_html = `<div class="card">
+                                                <div class="pic" onclick="this_post()">
+                                                    <img src="../static/place_pic/${place_pic} ">
+                                                </div>
+                                         </div>`
+
+                        $('#post-box').append(temp_html)
+                    }
+                }
+            });
         }
-        }
-        }
-        })
-        }
-        
+
+
+
 
     </script>
 </head>
@@ -170,7 +163,7 @@
                 <a class="button is-primary" onclick='$("#modal-post").addClass("is-active")'>
                     <strong>+</strong>
                 </a>
-                <a class="button is-light" onclick="location.href = './user.html'">   {#프로필 페이지로 이동#}
+                <a class="button is-light" onclick="location.href = '/user/{{ user_info.username }}'">   {#프로필 페이지로 이동#}
                     My profile
                 </a>
                 <a class="button is-light" onclick="sign_out()">
@@ -240,13 +233,7 @@
     </div>
 </section>
 <section class="section">
-    <div id="post-box" class="container">
-        <div class="card is-variable is-1-mobile is-0-tablet is-3-desktop is-8-widescreen is-2-fullhd">
-            <div class="card">
-                <img src="https://www.artinsight.co.kr/data/tmp/1908/1501cf89202c25ce439949ffd767c3dd_IUDfUfz6jJVJ.jpg">
-            </div>
-        </div>
-
+    <div id="post-box">
     </div>
 </section>
 </body>
