@@ -206,6 +206,13 @@ def update_like():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
+# 게시물 상세페이지 보여주기
+@app.route('/pic_detail', methods=['GET'])
+def showing():
+    post = list(db.post.find({}, {'_id': False}))
+
+    return render_template("detail.html", post=post)
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
