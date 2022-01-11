@@ -5,7 +5,6 @@ import hashlib
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
-import bcrypt
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -72,10 +71,8 @@ def sign_in():
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
 
-@app.route('/sign_up', methods=['POST'])
+@app.route('/sign_up/save', methods=['POST'])
 def sign_up():
-    new_user = request.json
-    new_user['password'] = bcrypt.hashpw(new_user['password'].encode('UTF-8'), bycrypt.gensalt())
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
     password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
@@ -171,6 +168,7 @@ def get_posts():
                 {"post_id": post["_id"], "type": "heart"})  # 해당 글의 좋아요가 몇개인지 확인
             post["heart_by_me"] = bool(db.likes.find_one(
                 {"post_id": post["_id"], "type": "heart", "username": payload['id']}))  # 해당 글의 좋아요를 내가 눌렀는지 확인
+
         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "posts": posts})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
