@@ -13,7 +13,7 @@ app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
 SECRET_KEY = 'SPARTA'
 
 client = MongoClient('localhost', 27017)
-db = client.dbsparta_plus_week4
+db = client.dbsparta_week1
 
 
 @app.route('/')
@@ -23,6 +23,7 @@ def home():
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.users.find_one({"username": payload["id"]})
         return render_template('index.html', user_info=user_info)
+
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
     except jwt.exceptions.DecodeError:
@@ -35,6 +36,7 @@ def login():
     return render_template('login.html', msg=msg)
 
 
+####유저네임을 통해서 프로필 페이지 보여주기(/user)######
 @app.route('/user/<username>')
 def user(username):
     # 각 사용자의 프로필과 글을 모아볼 수 있는 공간
@@ -95,32 +97,38 @@ def check_dup():
     return jsonify({'result': 'success', 'exists': exists})
 
 
+#####프로필페이지에서 프로필 사진업로드(/user)######
 @app.route('/update_profile', methods=['POST'])
 def save_img():
-    token_receive = request.cookies.get('mytoken')  # 본인 토큰 받아서
+    token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        username = payload["id"]  # id 받아오고
-        name_receive = request.form["name_give"]  # 닉네임 받아오고
-        about_receive = request.form["about_give"]  # 자기소개 받아와서
+        username = payload["id"]
+        name_receive = request.form["name_give"]
+        about_receive = request.form["about_give"]
+
         new_doc = {
             "profile_name": name_receive,
             "profile_info": about_receive
         }
-        if 'file_give' in request.files:  # 만약 유저가 파일을 보냈다면
+
+        if 'file_give' in request.files:
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
             file_path = f"profile_pics/{username}.{extension}"
-            file.save("./static/" + file_path)  # static폴더에 사진을 저장하고
+
+            file.save("./static/" + file_path)
             new_doc["profile_pic"] = filename
             new_doc["profile_pic_real"] = file_path
-        db.users.update_one({'username': payload['id']}, {'$set': new_doc})  # 해당 유저이름으로 업데이트
+        db.users.update_one({'username': payload['id']}, {'$set': new_doc})
+
         return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
 
+# 게시물 포스팅
 @app.route('/posting', methods=['POST'])
 def posting():
     token_receive = request.cookies.get('mytoken')
@@ -131,17 +139,20 @@ def posting():
         user_info = db.users.find_one({"username": payload["id"]})
         contents_receive = request.form["contents_give"]
         place_pic = request.files["place_pic_give"]
-        filename = secure_filename(place_pic.filename)
-        extension = filename.split('.')[-1]
 
-        filename = f'file_{username}'
-        save_to = f'static/{username}.{extension}'
+        extension = place_pic.filename.split('.')[-1]
+
+        today = datetime.now()
+        mytime = today.strftime('%Y%m%d%H%M%S')
+
+        picname = f'place_pic-{mytime}'
+        save_to = f'static/place_pic/{picname}.{extension}'
         place_pic.save(save_to)
 
         doc = {
             "username": user_info["username"],
             "contents": contents_receive,
-            'place_pic': f'{username}.{extension}'
+            'place_pic': f'{picname}.{extension}'
         }
 
         db.posts.insert_one(doc)
@@ -150,6 +161,7 @@ def posting():
         return redirect(url_for("home"))
 
 
+# 게시물 가져오기
 @app.route("/get_posts", methods=['GET'])
 def get_posts():
     token_receive = request.cookies.get('mytoken')
@@ -197,6 +209,21 @@ def update_like():
         return jsonify({"result": "success", 'msg': 'updated', "count": count})  # 클라이언트로 넘겨줌
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
+
+
+# 게시물 상세페이지 보여주기
+@app.route('/pic_detail', methods=['GET'])
+def showing():
+    post = list(db.post.find({}, {'_id': False}))
+
+    return render_template("detail.html", post=post)
+
+
+# 전체게시물 보여주기
+@app.route('/listing', methods=['GET'])
+def listing():
+    posts = list(db.posts.find({}, {'_id': False}))
+    return jsonify({'posts': posts})
 
 
 if __name__ == '__main__':
