@@ -17,7 +17,7 @@ client = MongoClient('localhost', 27017)
 db = client.dbsparta_week1
 
 
-#####메인페이지 토큰을 가져와서 해당유저데이터 불러오기(/)######
+#####메인페이지 토큰을 가져와서 해당유저데이터 불러오기('/')######
 @app.route('/')
 def home():
     token_receive = request.cookies.get('mytoken')
