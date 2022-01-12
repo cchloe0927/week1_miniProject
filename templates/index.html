@@ -11,6 +11,8 @@
 
     <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- Font Awesome CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -21,8 +23,7 @@
         body {
             background-color: skyblue;
             min-height: 100vh;
-            padding-top: 100px;
-            width: 100%;
+            padding-top: 3.25rem;
         }
 
         .section {
@@ -32,15 +33,10 @@
         }
 
         .is-sparta {
-            color: #05899d;
+            color: #05899d !important;
         }
 
-        .modal-content {
-            width: 600px;
-            max-width: 80%;
-        }
-
-        .button.is-post {
+        .button.is-sparta {
             background-color: #05899d;
             border-color: transparent;
             color: #fff !important;
@@ -52,100 +48,32 @@
             color: #05899d !important;
         }
 
+        .modal-content {
+            width: 600px;
+            max-width: 80%;
+        }
+
+        input::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+        .image img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
 
         .card {
-            max-width: 100%;
-            height: auto;
-            padding: 10px;
+            padding: 30px;
         }
 
-        .box {
-            width: 70%;
-            margin: auto;
-            margin-top: 50px;
-        }
-
-        .navbar {
-            height: 100px;
+        .pic {
+            padding: 20px;
         }
 
     </style>
     <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
-
-    <script>
-
-        $(document).ready(function () {
-            bsCustomFileInput.init()
-            listing()
-
-        })
-
-        function sign_out() {//로그아웃 버튼을 누르면
-            $.removeCookie('mytoken', {path: '/'});//쿠키를 브라우저에서 삭제
-            alert('로그아웃!')
-            window.location.href = "/login"
-        }
-
-        function posting() {
-            let contents = $("#textarea-contents").val()
-            let place_pic = $('#place-pic')[0].files[0]
-
-            let form_data = new FormData()
-
-            form_data.append("place_pic_give", place_pic)
-            form_data.append("contents_give", contents)
-
-            $.ajax({
-                type: "POST",
-                url: "/posting",
-                data: form_data,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    alert(response["msg"])
-                    window.location.reload()
-                }
-            });
-        }
-
-        $(document).ready(function () {
-            listing()
-        })
-
-        function this_post() { //디테일로 이동하는 함수
-            location.href = "/"
-        }
-
-
-        function listing() { //전체게시물 보여주기
-
-            $.ajax({
-                type: "GET",
-                url: "/listing",
-                data: {},
-                success: function (response) {
-                    let posts = response['posts']
-                    for (let i = 0; i < posts.length; i++) {
-                        {#let username = posts[i]['username']#}
-                        let place_pic = posts[i]['place_pic']
-
-                        let temp_html = `<div class="card">
-                                                <div class="pic" onclick="this_post()">
-                                                    <img src="../static/place_pic/${place_pic} ">
-                                                </div>
-                                         </div>`
-
-                        $('#post-box').append(temp_html)
-                    }
-                }
-            });
-        }
-
-
-
-
-    </script>
+    <script src="{{ url_for('static', filename='myjs.js') }}"></script>
 </head>
 
 <body>
@@ -164,15 +92,14 @@
                     <strong>+</strong>
                 </a>
                 <a class="button is-light" onclick="location.href = '/user/{{ user_info.username }}'">   {#프로필 페이지로 이동#}
-                    My profile
+                    <strong>My profile</strong>
                 </a>
                 <a class="button is-light" onclick="sign_out()">
-                    Log out
+                    <strong>Log out</strong>
                 </a>
             </div>
         </div>
     </div>
-
 </nav>
 <section>
     <div class="modal" id="modal-post">
@@ -233,7 +160,27 @@
     </div>
 </section>
 <section class="section">
-    <div id="post-box">
+    <div id="post-box" class="container">
+        <div class="card">
+            <div class="pic" onclick="location.href = '/'">
+                <img src="https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fb2rbPt%2Fbtqy0FJgja1%2FgBn90IqzhQj3wT1axgAiiK%2Fimg.jpg">
+                <nav class="level is-mobile">
+
+                    <div class="level-left">
+                        <div class="name">닉네임</div>
+                        <small>몇분 전</small>
+                        <a class="level-item is-sparta" aria-label="heart"
+                           onclick="toggle_like('', 'heart')">
+                                  <span class="icon is-small"><i class="fa fa-heart"
+                                                                 aria-hidden="true"></i></span>&nbsp;<span
+                                class="like-num">2.7k</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+            </nav>
+        </div>
+    </div>
     </div>
 </section>
 </body>

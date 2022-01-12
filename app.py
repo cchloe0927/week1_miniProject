@@ -6,7 +6,6 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 
-
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
@@ -14,7 +13,7 @@ app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
 SECRET_KEY = 'SPARTA'
 
 client = MongoClient('localhost', 27017)
-db = client.dbsparta_week1
+db = client.week1Project
 
 
 @app.route('/')
@@ -110,7 +109,7 @@ def save_img():
 
         new_doc = {
             "profile_name": name_receive,
-            "profile_info" : about_receive
+            "profile_info": about_receive
         }
 
         if 'file_give' in request.files:
@@ -128,17 +127,19 @@ def save_img():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
-#게시물 포스팅
+
+# 게시물 포스팅
 @app.route('/posting', methods=['POST'])
 def posting():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        username = payload["id"]
+
         # 포스팅하기
         user_info = db.users.find_one({"username": payload["id"]})
         contents_receive = request.form["contents_give"]
         place_pic = request.files["place_pic_give"]
+        date_receive = request.form["date_give"]
 
         extension = place_pic.filename.split('.')[-1]
 
@@ -151,8 +152,10 @@ def posting():
 
         doc = {
             "username": user_info["username"],
+            "profile_name": user_info["profile_name"],
             "contents": contents_receive,
-            'place_pic': f'{picname}.{extension}'
+            "place_pic": f'{picname}.{extension}',
+            "date": date_receive
         }
 
         db.posts.insert_one(doc)
@@ -161,24 +164,16 @@ def posting():
         return redirect(url_for("home"))
 
 #게시물 가져오기
-@app.route("/get_posts", methods=['GET'])
-def get_posts():
+@app.route('/listing', methods=['GET'])
+def listing():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        username_receive = request.args.get("username_give")
-        if username_receive == "":
-            posts = list(db.posts.find({}).sort("date", -1).limit(20))
-        else:
-            posts = list(db.posts.find({"username": username_receive}).sort("date", -1).limit(
-                20))  # db에서 username의 것들을 find하는데 date의 역순으로 가져온다 (20개 제한)
-
+        posts = list(db.posts.find())
         for post in posts:
-            post["_id"] = str(post["_id"])  # post를 가져 오는데 각각의 오브젝트를 가져온다
-            post["count_heart"] = db.likes.count_documents(
-                {"post_id": post["_id"], "type": "heart"})  # 해당 글의 좋아요가 몇개인지 확인
-            post["heart_by_me"] = bool(db.likes.find_one(
-                {"post_id": post["_id"], "type": "heart", "username": payload['id']}))  # 해당 글의 좋아요를 내가 눌렀는지 확인
+            post["_id"] = str(post["_id"])
+            post["count_heart"] = db.likes.count_documents({"post_id": post["_id"], "type": "heart"})#해당 글의 like 갯수를 파악
+            post["heart_by_me"] = bool(db.likes.find_one({"post_id": post["_id"], "type": "heart", "username": payload['id']}))#jwt토큰을 확인해서 username을 꺼내고 like타입을 확인해서 해당 게시글에 내 정보가 있으면 내가 좋아요를 눌렀는지 알게 됨
         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "posts": posts})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
@@ -189,10 +184,10 @@ def update_like():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])  # 토큰 가져와서
-        user_info = db.users.find_one({"username": payload["id"]})  # 누가 좋아요를 눌렀는지 확인하고
-        post_id_receive = request.form["post_id_give"]  # 포스트의 오브젝트를 확인하고
-        type_receive = request.form["type_give"]  # 어떤 종류의 좋아요인지
-        action_receive = request.form["action_give"]  # 실행하는건지 취소하는건지 액션확인해서
+        user_info = db.users.find_one({"username": payload["id"]})  # 누가 좋아요를 눌렀는지 파악
+        post_id_receive = request.form["post_id_give"]  # 클라이언트에서 넘겨준 post_id를 통해 게시물 파악
+        type_receive = request.form["type_give"]  # 어떤 종류의 like 인지 파악
+        action_receive = request.form["action_give"]  # 실행하는건지 취소하는건지 액션을 파악
         doc = {
             "post_id": post_id_receive,
             "username": user_info["username"],
@@ -216,11 +211,6 @@ def showing():
 
     return render_template("detail.html", post=post)
 
-# 전체게시물 보여주기
-@app.route('/listing', methods=['GET'])
-def listing():
-    posts = list(db.posts.find({},{'_id':False}))
-    return jsonify({'posts':posts})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
