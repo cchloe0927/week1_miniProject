@@ -146,6 +146,7 @@ def save_img():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
+
 # 게시물 포스팅
 @app.route('/posting', methods=['POST'])
 def posting():
@@ -181,6 +182,7 @@ def posting():
         return jsonify({"result": "success", 'msg': '포스팅 성공!'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
+
 
 # 전체게시물 보여주기
 @app.route('/listing', methods=['GET'])
@@ -224,7 +226,7 @@ def update_like():
             db.likes.delete_one(doc)
 
         count = db.likes.count_documents({"post_id": post_id_receive, "type": type_receive})  # 동작 완료 후 좋아요 개수 확인해서
-        db.posts.update({"post_id": post_id_receive}, {"$set": {"likeCount": count}})
+
         return jsonify({"result": "success", 'msg': 'updated', "count": count})  # 클라이언트로 넘겨줌
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
@@ -244,7 +246,7 @@ def detail():
             place_pic = post['place_pic']
             contents = post['contents']
 
-            pass_pic = {'username':username,'place_pic' : place_pic,'contents' : contents}
+            pass_pic = {'username': username, 'place_pic': place_pic, 'contents': contents}
             print(pass_pic)
             return render_template("detail.html", pass_pic=pass_pic)
 
