@@ -14,7 +14,7 @@ app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
 SECRET_KEY = 'SPARTA'
 
 client = MongoClient('localhost', 27017)
-db = client.dbsparta_week1
+db = client.week1Project
 
 
 #####메인페이지 토큰을 가져와서 해당유저데이터 불러오기('/')######
@@ -49,7 +49,7 @@ def user(username):
         status = (username == payload["id"])  # 내 프로필이면 True, 다른 사람 프로필 페이지면 False
 
         user_info = db.users.find_one({"username": username}, {"_id": False})
-        return render_template('user.html', user_info=user_info, status=status)
+        return render_template('user.html', user_info=user_info, status=status)  #status를 이용해서 프로필 수정 보이기/숨기기
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
@@ -113,7 +113,6 @@ def save_img():
         username = payload["id"]
         name_receive = request.form["name_give"]
         about_receive = request.form["about_give"]
-
         new_doc = {
             "profile_name": name_receive,
             "profile_info" : about_receive
@@ -128,7 +127,7 @@ def save_img():
             file.save("./static/"+file_path)
             new_doc["profile_pic"] = filename
             new_doc["profile_pic_real"] = file_path
-        db.users.update_one({'username': payload['id']}, {'$set':new_doc})
+        db.users.update_one({'username': payload['id']}, {'$set': new_doc})
 
         return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -168,25 +167,25 @@ def posting():
         return redirect(url_for("home"))
 
 
-#게시물 가져오기
-@app.route("/get_posts", methods=['GET'])
-def get_posts():
+# 전체게시물 보여주기
+@app.route('/listing', methods=['GET'])
+def listing():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         username_receive = request.args.get("username_give")
         if username_receive == "":
-            posts = list(db.posts.find({}).sort("date", -1).limit(20))
+            posts = list(db.posts.find())
         else:
-            posts = list(db.posts.find({"username": username_receive}).sort("date", -1).limit(20))  # db에서 username의 것들을 find하는데 date의 역순으로 가져온다 (20개 제한)
-
+            posts = list(db.posts.find({"username": username_receive}))
         for post in posts:
-            post["_id"] = str(post["_id"])  # post를 가져 오는데 각각의 오브젝트를 가져온다
-            post["count_heart"] = db.likes.count_documents({"post_id": post["_id"], "type": "heart"})  # 해당 글의 좋아요가 몇개인지 확인
-            post["heart_by_me"] = bool(db.likes.find_one({"post_id": post["_id"], "type": "heart", "username": payload['id']}))  # 해당 글의 좋아요를 내가 눌렀는지 확인
+            post["_id"] = str(post["_id"])
+            post["count_heart"] = db.likes.count_documents({"post_id": post["_id"], "type": "heart"}) #해당 글의 like 갯수를 파악
+            post["heart_by_me"] = bool(db.likes.find_one({"post_id": post["_id"], "type": "heart", "username": payload['id']}))#jwt토큰을 확인해서 username을 꺼내고 like타입을 확인해서 해당 게시글에 내 정보가 있으면 내가 좋아요를 눌렀는지 알게 됨
         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "posts": posts})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
+
 
 
 @app.route('/update_like', methods=['POST'])
@@ -222,12 +221,6 @@ def showing():
 
     return render_template("detail.html", post=post)
 
-
-# 전체게시물 보여주기
-@app.route('/listing', methods=['GET'])
-def listing():
-    posts = list(db.posts.find({},{'_id':False}))
-    return jsonify({'posts':posts})
 
 
 if __name__ == '__main__':
