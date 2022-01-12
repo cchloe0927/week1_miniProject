@@ -1,67 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>그해 우리는..</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>그해 우리는..</title>
 
-        <!-- Bulma CSS 링크 -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-        <link rel="stylesheet" href="../static/detail.css">
-        <!-- 구글폰트 적용 -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Sunflower:wght@300&display=swap" rel="stylesheet">
+    <!-- Bulma CSS 링크 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="../static/detail.css">
+    <!-- 구글폰트 적용 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Sunflower:wght@300&display=swap"
+          rel="stylesheet">
 
-        <!-- 폰트어썸 -->
-        <script src="https://kit.fontawesome.com/6478f529f2.js" crossorigin="anonymous"></script>
+    <!-- 폰트어썸 -->
+    <script src="https://kit.fontawesome.com/6478f529f2.js" crossorigin="anonymous"></script>
 
-        <!-- JS -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-                crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-        <script src="../static/detail.js"></script>
-        <script>
 
-        </script>
-    </head>
-    <body>
-        <div class="wrapper">
-            <!-- nav bar -->
-            <!-- Main container -->
-            <nav class="level">
-              <!-- Left side -->
-              <div class="level-left">
-                <p class="level-item"><i class="fas fa-car-side fa-2x"></i></p>
-                <p class="level-item"><span>그해 우리는...</span></p>
-              </div>
+    <script>
+        function sign_out() {//로그아웃 버튼을 누르면
+            $.removeCookie('mytoken', {path: '/'});//쿠키를 브라우저에서 삭제
+            alert('로그아웃!')
+            window.location.href = "/login"
+        }
+    </script>
 
-              <!-- Right side -->
-              <div class="level-right">
-                <p class="level-item"><a onclick="window.location.href='/'">마이페이지</a></p>
-                <p class="level-item"><a onclick="sign_out()">로그아웃</a></p>
-              </div>
-            </nav>
-            <!-- 사진부분 -->
-            <section class="section" id="pic-box">
-                    <img src="{{ post[0]['img_url'] }}" alt={{ post[0]['comment'] }}>
-                    <p class="show_like">like : {{ post[0]['like'] }} </p>
-                    <p class="show_comment">comment : {{ post[0]['comment'] }}</p>
-            </section>
+</head>
+<body>
+<div class="wrapper">
+    <!-- nav bar -->
+    <!-- Main container -->
+    <nav class="level">
+        <!-- Left side -->
+        <div class="level-left">
+            <p class="level-item"><i class="fas fa-car-side fa-2x"></i></p>
+            <p class="level-item"><span>그해 우리는...</span></p>
         </div>
-        <!-- footer -->
-        <footer class="footer">
-          <div class="content has-text-centered">
-            <p>
-              <strong>그해 우리는</strong> by 6조
-            </p>
-            <p>이현정</p><p>최창용</p><p>이재정</p><p>박효준</p>
-          </div>
-        </footer>
-    </body>
+
+        <!-- Right side -->
+        <div class="level-right">
+            <p class="level-item"><a onclick="window.location.href='/'">메인페이지</a></p>
+            <p class="level-item"><a onclick="sign_out()">로그아웃</a></p>
+        </div>
+    </nav>
+    <!-- 사진부분 -->
+    <section class="section" id="pic-box">
+        <img src="../static/place_pic/{{ pass_pic['place_pic'] }}" alt={{ pass_pic['contents'] }}>
+        <p class="show_like">{{ pass_pic['username'] }} </p>
+        <p class="show_comment">comment : {{ pass_pic['contents'] }}</p>
+    </section>
+</div>
+<!-- footer -->
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>
+            <strong>그해 우리는</strong> by 6조
+        </p>
+        <p>이현정</p>
+        <p>최창용</p>
+        <p>이재정</p>
+        <p>박효준</p>
+    </div>
+</footer>
+</body>
 </html>
 
 
