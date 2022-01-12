@@ -1,300 +1,204 @@
 <!doctype html>
 <html lang="en">
-    <head>
+<head>
 
-        <!-- Webpage Title -->
-        <title>{{ user_info.name }} | 그 해 우리는 어디를 갔을까</title>
+    <!-- Webpage Title -->
+    <title>{{ user_info.name }} | 그 해 우리는 어디를 갔을까</title>
 
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <!-- Bulma CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-        <!-- Font Awesome CSS -->
-        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- Font Awesome CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-        <!-- JS -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-        <!-- myjs.js 임포트 -->
-        {#<script src="{{ url_for('static', filename='myjs.js') }}"></script>#}
-
-
-        <style>
-            body {
-                background-color: white;
-                min-height: 100vh;
-                padding-top: 3.25rem;
-            }
-
-            .section {
-                padding: 1rem 1.5rem;
-                max-width: 750px;
-                margin: auto;
-                margin-top: 40px;
-            }
-
-            .title {
-                color: black;
-            }
-
-            .button.is-sparta.is-outlined {
-                margin-right: 340px;
-            }
-
-            .modal-content {
-                width: 600px;
-                max-width: 80%;
-            }
-
-            input::-webkit-calendar-picker-indicator {
-                display: none;
-            }
-
-            .image img {
-                object-fit: cover;
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-
-        <script>
-            // {#메인페이지와 다른게 usename을 받아와서 listing을 불러와야함#}
-            $(document).ready(function () {
-                // bsCustomFileInput.init()
-                listing('{{ user_info.username }}');
-            })
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <!-- myjs.js 임포트 -->
+    <script src="{{ url_for('static', filename='myjs.js') }}"></script>
 
 
-            // 메인페이지와 동일한 posting함수 : 같은 게시물을 가져오기 때문에 유저페이지에 필요없지 않나...??
-            function posting() {
-                let contents = $("#textarea-contents").val()
-                let place_pic = $('#place-pic')[0].files[0]
+    <style>
+        body {
+            background-color: white;
+            min-height: 100vh;
+            padding-top: 3.25rem;
+        }
 
-                let form_data = new FormData()
+        .section {
+            padding: 1rem 1.5rem;
+            max-width: 750px;
+            margin: auto;
+            margin-top: 40px;
+        }
 
-                form_data.append("place_pic_give", place_pic)
-                form_data.append("contents_give", contents)
+        .title {
+            color: black;
+        }
 
-                $.ajax({
-                    type: "POST",
-                    url: "/posting",
-                    data: form_data,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    success: function (response) {
+        .button.is-sparta.is-outlined {
+            margin-right: 340px;
+        }
+
+        .modal-content {
+            width: 600px;
+            max-width: 80%;
+        }
+
+        input::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+        .image img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+    <script>
+        // {#메인페이지와 다른게 usename을 받아와서 listing을 불러와야함#}
+        $(document).ready(function () {
+            listing('{{ user_info.username }}');
+        })
+
+        function update_profile() {
+            let name = $('#input-name').val()
+            let file = $('#input-pic')[0].files[0]    //프로필 파옴
+            let about = $("#textarea-about").val()    //자기소개 칸
+            let form_data = new FormData()
+            form_data.append("file_give", file)
+            form_data.append("name_give", name)
+            form_data.append("about_give", about)
+            console.log(name, file, about, form_data)
+
+
+            $.ajax({
+                type: "POST",
+                url: "/update_profile",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response["result"] == "success") {
                         alert(response["msg"])
                         window.location.reload()
                     }
-                });
-            }
-
-
-            //전체게시물 보여주기 (메인페이지와 차이점 : username을 받아와서 해당 user의 게시물만 보여줌)
-            function listing(username) {
-                if (username == undefined) {//만약에 유저네임이 입력되지 않았으면 빈칸으로 하고 입력되있으면 그대로 씀
-                    username = ""
                 }
-                $.ajax({
-                    type: "GET",
-                    url: `/listing?username_give=${username}`,  //'get'이기 때문에 url에서 ?를 써서 뒤에 유저네임을 받아옴
-                    data: {},
-                    success: function (response) {
-                        let posts = response['posts']
-                        for (let i = 0; i < posts.length; i++) {
-                            {#let username = posts[i]['username']#}
-                            let place_pic = posts[i]['place_pic']
-
-                            let temp_html = `<div class="card">
-                                                <div class="pic" onclick="this_post()">
-                                                    <img src="../static/place_pic/${place_pic} ">
-                                                </div>
-                                         </div>`
-
-                            $('#post-box').append(temp_html)
-                        }
-                    }
-                });
-            }
+            })
+        }
+    </script>
+</head>
 
 
-            function this_post() { //디테일로 이동하는 함수
-                location.href = "/detail"
-            }
+<body class="has-navbar-fixed-top">
 
+<nav class="navbar is-fixed-top is-info" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+            <strong class="title"
+                    style="font-family:'Stylish', sans-serif; font-size: larger;">그해 우리는 어디에 갔을까?</strong>
+        </a>
+    </div>
+</nav>
 
+<section class="section">
 
-            // {#로그아웃 기능#}
-            function sign_out() {
-                $.removeCookie('mytoken', {path: '/'});
-                // {#쿠키를 지워주는 함수#}
-                alert('로그아웃!')
-                window.location.href = "/login"  {#로그인페이지로 이동#}
-            }
-
-            {#프로필 수정 기능#}
-            function update_profile() {
-                let name = $('#input-name').val()
-                let file = $('#input-pic')[0].files[0]    //프로필 파옴
-                let about = $("#textarea-about").val()    //자기소개 칸
-                let form_data = new FormData()
-                form_data.append("file_give", file)
-                form_data.append("name_give", name)
-                form_data.append("about_give", about)
-                console.log(name, file, about, form_data)
-
-                $.ajax({
-                    type: "POST",
-                    url: "/update_profile",
-                    data: form_data,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    success: function (response) {
-                        if (response["result"] == "success") {
-                            alert(response["msg"])
-                            window.location.reload()
-
-                        }
-                    }
-                });
-            }
-        </script>
-    </head>
-
-
-    <body class="has-navbar-fixed-top">
-    {#상단의 타이틀 바#}
-    <nav class="navbar is-fixed-top is-info" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <a class="navbar-item" href="/">
-                <strong class="title"
-                        style="font-family:'Stylish', sans-serif; font-size: larger;">그해 우리는 어디에 갔을까?</strong>
-            </a>
-        </div>
-    </nav>
-     {#프로필 + 자기소개#}
-    <section class="section">
-        {#프로필 파일 + 자기소개텍스트#}
-        <div>
-            <article class="media">
-                <figure class="media-left" style="align-self: center">
-                    <a class="image is-96x96" href="#">
-                        <img class="is-rounded" src="{{ url_for('static', filename=user_info.profile_pic_real) }}">
-                    </a>
-                </figure>
-                <div class="media-content">
-                    <div class="content">
-                        <p>
-                            <strong>{{ user_info.profile_name }}</strong> <small>@{{ user_info.username }}</small>
-                            <br>
-                            {{ user_info.profile_info }}
-                        </p>
-                    </div>
-                    {#프로필 수정버튼 + 로그아웃버튼#}
-                    {% if status %}  {#status로 유저가 자신일때만 보여주게 하기#}
-                        <nav id="btns-me" class="level is-mobile" style="margin-top:2rem">
-                        <button onclick='$("#modal-edit").addClass("is-active")' class="button is-info is-sparta">프로필 수정
-                            &nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-pencil"
-                                                                                   aria-hidden="true"></i></span>
-                        </button>
-                        <button onclick="sign_out()" class="button is-info is-outlined is-sparta">로그아웃
-                            &nbsp;&nbsp;<span class="icon is-small"><i
-                                class="fa fa-sign-out" aria-hidden="true"></i></span>
-                        </button>
-                    </nav>
-                    {% endif %}
+    <div>
+        <article class="media">
+            <figure class="media-left" style="align-self: center">
+                <a class="image is-96x96" href="#">
+                    <img class="is-rounded" src="{{ url_for('static', filename=user_info.profile_pic_real) }}">
+                </a>
+            </figure>
+            <div class="media-content">
+                <div class="content">
+                    <p>
+                        <strong>{{ user_info.profile_name }}</strong> <small>@{{ user_info.username }}</small>
+                        <br>
+                    </p>
                 </div>
-            </article>
-        </div>
-        {#프로필 수정하기 모달#}
-        {% if status %}   {#status로 유저가 자신일때만 보여주게 하기#}
-            <div class="modal" id="modal-edit">
-            <div class="modal-background" onclick='$("#modal-edit").removeClass("is-active")'></div>
-            <div class="modal-content">
-                <div class="box">
-                    <article class="media">
-                        <div class="media-content">
-                            <div class="field">
-                        <label class="label" for="input-name">이름</label>
-                        <p class="control">
-                            <input id="input-name" class="input"
-                                   placeholder="" value="{{ user_info.profile_name }}">
-                        </p>
-                    </div>
-                            <div class="field">
-                                <label class="label" for="input-pic">프로필 사진</label>
-                                <div class="control is-expanded">
-                                    <div class="file has-name">
-                                        <label class="file-label" style="width:100%">
-                                            <input id="input-pic" class="file-input" type="file"
-                                                   name="resume">
-                                            <span class="file-cta"><span class="file-icon"><i
-                                                    class="fa fa-upload"></i></span>
+                <nav id="btns-me" class="level is-mobile" style="margin-top:2rem">
+                    <button onclick='$("#modal-edit").addClass("is-active")' class="button is-info is-sparta">프로필 수정
+                        &nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-pencil"
+                                                                   aria-hidden="true"></i></span>
+                    </button>
+                    <button onclick="sign_out()" class="button is-info is-outlined is-sparta">로그아웃
+                        &nbsp;&nbsp;<span class="icon is-small"><i
+                                class="fa fa-sign-out" aria-hidden="true"></i></span>
+                    </button>
+                </nav>
+            </div>
+        </article>
+    </div>
+    <div class="modal" id="modal-edit">
+        <div class="modal-background" onclick='$("#modal-edit").removeClass("is-active")'></div>
+        <div class="modal-content">
+            <div class="box">
+                <article class="media">
+                    <div class="media-content">
+                        <div class="field">
+                            <label class="label" for="input-name">이름</label>
+                            <p class="control">
+                                <input id="input-name" class="input"
+                                       placeholder="" value="{{ user_info.profile_name }}">
+                            </p>
+                        </div>
+                        <div class="field">
+                            <label class="label" for="input-pic">프로필 사진</label>
+                            <div class="control is-expanded">
+                                <div class="file has-name">
+                                    <label class="file-label" style="width:100%">
+                                        <input id="input-pic" class="file-input" type="file"
+                                               name="resume">
+                                        <span class="file-cta"><span class="file-icon"><i
+                                                class="fa fa-upload"></i></span>
                                 <span class="file-label">파일 선택</span>
                             </span>
-                                            <span id="file-name" class="file-name"
-                                                  style="width:100%;max-width:100%">{{ user_info.profile_pic }}</span>
-                                        </label>
-                                    </div>
+                                        <span id="file-name" class="file-name"
+                                              style="width:100%;max-width:100%">{{ user_info.profile_pic }}</span>
+                                    </label>
                                 </div>
                             </div>
-                            <div class="field">
-                                <label class="label" for="textarea-about">자기소개</label>
-                                <p class="control">
+                        </div>
+                        <div class="field">
+                            <label class="label" for="textarea-about">자기소개</label>
+                            <p class="control">
                         <textarea id="textarea-about" class="textarea"
                                   placeholder="자기소개하기">{{ user_info.profile_info }}</textarea>
-                                </p>
-                            </div>
-                            <nav class="level is-mobile">
-                                <div class="level-left">
-                                </div>
-                                <div class="level-right">
-                                    <div class="level-item">
-                                        <a class="button is-sparta" onclick="update_profile()">업데이트</a>
-                                    </div>
-                                    <div class="level-item">
-                                        <a class="button is-info is-outlined"
-                                           onclick='$("#modal-edit").removeClass("is-active")'>취소</a>
-                                    </div>
-                                </div>
-                            </nav>
+                            </p>
                         </div>
-                    </article>
-                </div>
+                        <nav class="level is-mobile">
+                            <div class="level-left">
+                            </div>
+                            <div class="level-right">
+                                <div class="level-item">
+                                    <a class="button is-sparta" onclick="update_profile()">업데이트</a>
+                                </div>
+                                <div class="level-item">
+                                    <a class="button is-info is-outlined"
+                                       onclick='$("#modal-edit").removeClass("is-active")'>취소</a>
+                                </div>
+                            </div>
+                        </nav>
+                    </div>
+                </article>
             </div>
-            <button class="modal-close is-large" aria-label="close"
-                    onclick='$("#modal-edit").removeClass("is-active")'></button>
         </div>
-        {% endif %}
-    </section>
-    {#게시글 리스트 : 메인페이지에서 받아온 게시글 업로드 (추후 수정)#}
-    <section class="section">
-        <div id="post-box">
-        </div>
-    </section>
-{#    <section class="section">#}
-{#        <div id="post-box" class="container">#}
-{#            <div>#}
-{#                <div class="media-content">#}
-{#                    <figure class="image is-128x128">#}
-{#                        <img src="https://bulma.io/images/placeholders/256x256.png">#}
-{#                    </figure>#}
-{#                    <nav class="level is-mobile">#}
-{#                        <div class="level-left">#}
-{#                            <a class="level-item is-sparta" aria-label="heart"#}
-{#                               onclick="toggle_like('', 'heart')">#}
-{#                                  <span class="icon is-small"><i class="fa fa-heart"#}
-{#                                                                 aria-hidden="true"></i></span>&nbsp;<span#}
-{#                                    class="like-num">2.7k</span>#}
-{#                            </a>#}
-{#                        </div>#}
-{#                    </nav>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </section>#}
-    </body>
+        <button class="modal-close is-large" aria-label="close"
+                onclick='$("#modal-edit").removeClass("is-active")'></button>
+    </div>
+</section>
+<section class="section">
+    <div id="post-box">
+    </div>
+</section>
+</body>
+
+</body>
+
 </html>
