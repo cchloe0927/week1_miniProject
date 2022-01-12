@@ -2,10 +2,10 @@ from pymongo import MongoClient
 import jwt
 import datetime
 import hashlib
+import bcrypt
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
-
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -27,9 +27,9 @@ def home():
         return render_template('index.html', user_info=user_info)
 
     except jwt.ExpiredSignatureError:
-        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        return redirect(url_for("login"))
     except jwt.exceptions.DecodeError:
-        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
+        return redirect(url_for("login"))
 
 
 #####로그인하면 메세지 띄우기(/login)######
@@ -49,7 +49,7 @@ def user(username):
         status = (username == payload["id"])  # 내 프로필이면 True, 다른 사람 프로필 페이지면 False
 
         user_info = db.users.find_one({"username": username}, {"_id": False})
-        return render_template('user.html', user_info=user_info, status=status)  #status를 이용해서 프로필 수정 보이기/숨기기
+        return render_template('user.html', user_info=user_info, status=status)  # status를 이용해서 프로필 수정 보이기/숨기기
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
@@ -58,18 +58,25 @@ def user(username):
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
     # 로그인
+    # id, pw를 받아서 맞춰보고, 토큰을 만들어 발급합니다.
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
 
-    pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
-    result = db.users.find_one({'username': username_receive, 'password': pw_hash})
-
-    if result is not None:
+    # bcrypt로 비밀번호를 해쉬화 한다
+    hash_pw = bcrypt.hashpw(password_receive.encode('utf-8'), bcrypt.gensalt())
+    hashed_pw = hash_pw.decode('utf-8')
+    check_pw_match = bcrypt.checkpw(password_receive.encode('utf-8'), hash_pw)
+    # print(check_pw_match)
+    current_user = db.users.find_one({'username': username_receive})
+    # print(current_user)
+    # pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
+    if current_user and check_pw_match:
         payload = {
             'id': username_receive,
             'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        print(token)
 
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
@@ -77,22 +84,28 @@ def sign_in():
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
 
-
 #####유저네임과 pw, 프로필이름, 프로필사진, 프로필 한 마디 db에 저장(/login)######
 @app.route('/sign_up/save', methods=['POST'])
 def sign_up():
+    # 유저 아이디, 비밀번호 받아오기
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
-    password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
+
+    # bcrypt로 비밀번호를 해쉬화 한다
+    hash_pw = bcrypt.hashpw(password_receive.encode("utf-8"), bcrypt.gensalt())
+    hashed_pw = hash_pw.decode('utf-8')
+
+    # password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
     doc = {
         "username": username_receive,  # 아이디
-        "password": password_hash,  # 비밀번호
+        "password": hashed_pw,  # 비밀번호
         "profile_name": username_receive,  # 프로필 이름 기본값은 아이디
         "profile_pic": "",  # 프로필 사진 파일 이름
         "profile_pic_real": "profile_pics/profile_placeholder.png",  # 프로필 사진 기본 이미지
         "profile_info": ""  # 프로필 한 마디
     }
     db.users.insert_one(doc)
+
     return jsonify({'result': 'success'})
 
 
@@ -115,7 +128,7 @@ def save_img():
         about_receive = request.form["about_give"]
         new_doc = {
             "profile_name": name_receive,
-            "profile_info" : about_receive
+            "profile_info": about_receive
         }
 
         if 'file_give' in request.files:
@@ -124,7 +137,7 @@ def save_img():
             extension = filename.split(".")[-1]
             file_path = f"profile_pics/{username}.{extension}"
 
-            file.save("./static/"+file_path)
+            file.save("./static/" + file_path)
             new_doc["profile_pic"] = filename
             new_doc["profile_pic_real"] = file_path
         db.users.update_one({'username': payload['id']}, {'$set': new_doc})
@@ -134,7 +147,7 @@ def save_img():
         return redirect(url_for("home"))
 
 
-#게시물 포스팅
+# 게시물 포스팅
 @app.route('/posting', methods=['POST'])
 def posting():
     token_receive = request.cookies.get('mytoken')
@@ -171,25 +184,33 @@ def posting():
         return redirect(url_for("home"))
 
 
+#
+# # 게시물 가져오기
+# @app.route("/get_posts", methods=['GET'])
+# def get_posts():
+
+
+# 게시물 가져오기
+
+
 # 전체게시물 보여주기
 @app.route('/listing', methods=['GET'])
 def listing():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+
         username_receive = request.args.get("username_give")
-        if username_receive == "":
-            posts = list(db.posts.find())
-        else:
-            posts = list(db.posts.find({"username": username_receive}))
+        posts = list(db.posts.find({}).sort("date", -1))
         for post in posts:
             post["_id"] = str(post["_id"])
-            post["count_heart"] = db.likes.count_documents({"post_id": post["_id"], "type": "heart"}) #해당 글의 like 갯수를 파악
-            post["heart_by_me"] = bool(db.likes.find_one({"post_id": post["_id"], "type": "heart", "username": payload['id']}))#jwt토큰을 확인해서 username을 꺼내고 like타입을 확인해서 해당 게시글에 내 정보가 있으면 내가 좋아요를 눌렀는지 알게 됨
+            post["count_heart"] = db.likes.count_documents(
+                {"post_id": post["_id"], "type": "heart"})  # 해당 글의 like 갯수를 파악
+            post["heart_by_me"] = bool(db.likes.find_one({"post_id": post["_id"], "type": "heart", "username": payload[
+                'id']}))  # jwt토큰을 확인해서 username을 꺼내고 like타입을 확인해서 해당 게시글에 내 정보가 있으면 내가 좋아요를 눌렀는지 알게 됨
         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "posts": posts})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
-
 
 
 @app.route('/update_like', methods=['POST'])
@@ -217,14 +238,12 @@ def update_like():
         return redirect(url_for("home"))
 
 
-
 # 게시물 상세페이지 보여주기
 @app.route('/pic_detail', methods=['GET'])
 def showing():
     post = list(db.post.find({}, {'_id': False}))
 
     return render_template("detail.html", post=post)
-
 
 
 if __name__ == '__main__':
