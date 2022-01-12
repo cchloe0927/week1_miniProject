@@ -3,7 +3,7 @@
     <head>
 
         <!-- Webpage Title -->
-        <title>{{ user_info.name }} | week1 미니프로젝트</title>
+        <title>{{ user_info.name }} | 그 해 우리는 어디를 갔을까</title>
 
         <!-- Required meta tags -->
         <meta charset="utf-8">
@@ -18,7 +18,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
         <!-- myjs.js 임포트 -->
-        <script src="{{ url_for('static', filename='myjs.js') }}"></script>
+        {#<script src="{{ url_for('static', filename='myjs.js') }}"></script>#}
 
 
         <style>
@@ -60,15 +60,76 @@
         </style>
 
         <script>
-            {#메인페이지와 다른게 usename을 받아와서 gdt_posts를 불러와야함#}
+            // {#메인페이지와 다른게 usename을 받아와서 listing을 불러와야함#}
             $(document).ready(function () {
-                get_posts('{{ user_info.username }}');
+                // bsCustomFileInput.init()
+                listing('{{ user_info.username }}');
             })
 
 
-            {#로그아웃 기능#}
+            // 메인페이지와 동일한 posting함수 : 같은 게시물을 가져오기 때문에 유저페이지에 필요없지 않나...??
+            function posting() {
+                let contents = $("#textarea-contents").val()
+                let place_pic = $('#place-pic')[0].files[0]
+
+                let form_data = new FormData()
+
+                form_data.append("place_pic_give", place_pic)
+                form_data.append("contents_give", contents)
+
+                $.ajax({
+                    type: "POST",
+                    url: "/posting",
+                    data: form_data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        alert(response["msg"])
+                        window.location.reload()
+                    }
+                });
+            }
+
+
+            //전체게시물 보여주기 (메인페이지와 차이점 : username을 받아와서 해당 user의 게시물만 보여줌)
+            function listing(username) {
+                if (username == undefined) {//만약에 유저네임이 입력되지 않았으면 빈칸으로 하고 입력되있으면 그대로 씀
+                    username = ""
+                }
+                $.ajax({
+                    type: "GET",
+                    url: `/listing?username_give=${username}`,  //'get'이기 때문에 url에서 ?를 써서 뒤에 유저네임을 받아옴
+                    data: {},
+                    success: function (response) {
+                        let posts = response['posts']
+                        for (let i = 0; i < posts.length; i++) {
+                            {#let username = posts[i]['username']#}
+                            let place_pic = posts[i]['place_pic']
+
+                            let temp_html = `<div class="card">
+                                                <div class="pic" onclick="this_post()">
+                                                    <img src="../static/place_pic/${place_pic} ">
+                                                </div>
+                                         </div>`
+
+                            $('#post-box').append(temp_html)
+                        }
+                    }
+                });
+            }
+
+
+            function this_post() { //디테일로 이동하는 함수
+                location.href = "/detail"
+            }
+
+
+
+            // {#로그아웃 기능#}
             function sign_out() {
-                $.removeCookie('mytoken', {path: '/'});  {#쿠키를 지워주는 함수#}
+                $.removeCookie('mytoken', {path: '/'});
+                // {#쿠키를 지워주는 함수#}
                 alert('로그아웃!')
                 window.location.href = "/login"  {#로그인페이지로 이동#}
             }
@@ -76,8 +137,8 @@
             {#프로필 수정 기능#}
             function update_profile() {
                 let name = $('#input-name').val()
-                let file = $('#input-pic')[0].files[0]
-                let about = $("#textarea-about").val()
+                let file = $('#input-pic')[0].files[0]    //프로필 파옴
+                let about = $("#textarea-about").val()    //자기소개 칸
                 let form_data = new FormData()
                 form_data.append("file_give", file)
                 form_data.append("name_give", name)
@@ -192,7 +253,7 @@
                                 </div>
                                 <div class="level-right">
                                     <div class="level-item">
-                                        <a class="button is-info" onclick="update_profile()">업데이트</a>
+                                        <a class="button is-sparta" onclick="update_profile()">업데이트</a>
                                     </div>
                                     <div class="level-item">
                                         <a class="button is-info is-outlined"
@@ -209,26 +270,31 @@
         </div>
         {% endif %}
     </section>
+    {#게시글 리스트 : 메인페이지에서 받아온 게시글 업로드 (추후 수정)#}
     <section class="section">
-        <div id="post-box" class="container">
-            <div>
-                <div class="media-content">
-                    <figure class="image is-128x128">
-                        <img src="https://bulma.io/images/placeholders/256x256.png">
-                    </figure>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item is-sparta" aria-label="heart"
-                               onclick="toggle_like('', 'heart')">
-                                  <span class="icon is-small"><i class="fa fa-heart"
-                                                                 aria-hidden="true"></i></span>&nbsp;<span
-                                    class="like-num">2.7k</span>
-                            </a>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-        </div>  {#게시글 리스트 : 메인페이지에서 받아온 게시글 업로드 (추후 수정)#}
+        <div id="post-box">
+        </div>
     </section>
+{#    <section class="section">#}
+{#        <div id="post-box" class="container">#}
+{#            <div>#}
+{#                <div class="media-content">#}
+{#                    <figure class="image is-128x128">#}
+{#                        <img src="https://bulma.io/images/placeholders/256x256.png">#}
+{#                    </figure>#}
+{#                    <nav class="level is-mobile">#}
+{#                        <div class="level-left">#}
+{#                            <a class="level-item is-sparta" aria-label="heart"#}
+{#                               onclick="toggle_like('', 'heart')">#}
+{#                                  <span class="icon is-small"><i class="fa fa-heart"#}
+{#                                                                 aria-hidden="true"></i></span>&nbsp;<span#}
+{#                                    class="like-num">2.7k</span>#}
+{#                            </a>#}
+{#                        </div>#}
+{#                    </nav>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </section>#}
     </body>
 </html>
