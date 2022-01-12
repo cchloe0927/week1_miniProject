@@ -20,53 +20,10 @@
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-    <style>
-        body {
-            background-color: RGBA(232, 52, 78, 0.2);
-            min-height: 100vh;
-        }
 
-        .section {
-            padding: 1rem 1.5rem;
-            max-width: 750px;
-            margin: auto;
-        }
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='login/login.js') }}"></script>
 
-        .title {
-            font-weight: 800;
-            font-size: 5rem;
-            font-family: 'Jua', sans-serif;
-        }
-
-        .subtitle {
-            font-size: 2rem;
-            font-family: 'Jua', sans-serif;
-        }
-
-        .is-sparta {
-            color: #e8344e !important;
-        }
-
-        .button.is-sparta {
-            background-color: #e8344e;
-            border-color: transparent;
-            color: #fff !important;
-        }
-
-        .button.is-sparta.is-outlined {
-            background-color: transparent;
-            border-color: #e8344e;
-            color: #e8344e !important;
-        }
-
-        .help {
-            color: gray;
-        }
-
-        .is-hidden {
-            display: none !important;
-        }
-    </style>
 
     <script>
         // {% if msg %}
@@ -132,17 +89,11 @@
                 $("#help-password").text("비밀번호를 입력해주세요.").removeClass("is-safe").addClass("is-danger")
                 $("#input-password").focus()
                 return;
-            } else if (!is_password(password)) {
+            } else if (!is_password(password) && password.includes(username)) {
 
-                if (!is_password(password) && password.length === password) {
-                    $("#help-password").text("아이디와 같은 비밀번호입니다! ").removeClass("is-safe").addClass("is-danger")
-                )
-                    $("#input-password").focus()
-                } else {
-                    $("#help-password").text("비밀번호의 형식을 확인해주세요. 영문과 숫자 필수 포함, 특수문자(!@#$%^&*) 사용가능 8-20자").removeClass("is-safe").addClass("is-danger")
-                    $("#input-password").focus()
-                }
-                return;
+                $("#help-password").text("아이디와 같은 비밀번호 입니다").removeClass("is-safe").addClass("is-danger")
+                $("#input-password").focus()
+                return alert('아이디와 같은 비밀번호입니다')
             } else {
                 $("#help-password").text("사용할 수 있는 비밀번호입니다.").removeClass("is-danger").addClass("is-success")
             }
@@ -222,7 +173,7 @@
                     $("#help-id").removeClass("is-loading")
 
                 }
-            });
+            })
         }
 
     </script>

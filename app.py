@@ -7,7 +7,6 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 
-
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
@@ -50,7 +49,7 @@ def user(username):
         status = (username == payload["id"])  # 내 프로필이면 True, 다른 사람 프로필 페이지면 False
 
         user_info = db.users.find_one({"username": username}, {"_id": False})
-        return render_template('user.html', user_info=user_info, status=status)  #status를 이용해서 프로필 수정 보이기/숨기기
+        return render_template('user.html', user_info=user_info, status=status)  # status를 이용해서 프로필 수정 보이기/숨기기
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
@@ -83,7 +82,6 @@ def sign_in():
     # 찾지 못하면
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
-
 
 
 #####유저네임과 pw, 프로필이름, 프로필사진, 프로필 한 마디 db에 저장(/login)######
@@ -130,7 +128,7 @@ def save_img():
         about_receive = request.form["about_give"]
         new_doc = {
             "profile_name": name_receive,
-            "profile_info" : about_receive
+            "profile_info": about_receive
         }
 
         if 'file_give' in request.files:
@@ -139,7 +137,7 @@ def save_img():
             extension = filename.split(".")[-1]
             file_path = f"profile_pics/{username}.{extension}"
 
-            file.save("./static/"+file_path)
+            file.save("./static/" + file_path)
             new_doc["profile_pic"] = filename
             new_doc["profile_pic_real"] = file_path
         db.users.update_one({'username': payload['id']}, {'$set': new_doc})
@@ -149,8 +147,7 @@ def save_img():
         return redirect(url_for("home"))
 
 
-
-#게시물 포스팅
+# 게시물 포스팅
 @app.route('/posting', methods=['POST'])
 def posting():
     token_receive = request.cookies.get('mytoken')
@@ -186,6 +183,7 @@ def posting():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
+
 #
 # # 게시물 가져오기
 # @app.route("/get_posts", methods=['GET'])
@@ -206,12 +204,13 @@ def listing():
         posts = list(db.posts.find({}).sort("date", -1))
         for post in posts:
             post["_id"] = str(post["_id"])
-            post["count_heart"] = db.likes.count_documents({"post_id": post["_id"], "type": "heart"})#해당 글의 like 갯수를 파악
-            post["heart_by_me"] = bool(db.likes.find_one({"post_id": post["_id"], "type": "heart", "username": payload['id']}))#jwt토큰을 확인해서 username을 꺼내고 like타입을 확인해서 해당 게시글에 내 정보가 있으면 내가 좋아요를 눌렀는지 알게 됨
+            post["count_heart"] = db.likes.count_documents(
+                {"post_id": post["_id"], "type": "heart"})  # 해당 글의 like 갯수를 파악
+            post["heart_by_me"] = bool(db.likes.find_one({"post_id": post["_id"], "type": "heart", "username": payload[
+                'id']}))  # jwt토큰을 확인해서 username을 꺼내고 like타입을 확인해서 해당 게시글에 내 정보가 있으면 내가 좋아요를 눌렀는지 알게 됨
         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "posts": posts})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
-
 
 
 @app.route('/update_like', methods=['POST'])
@@ -239,14 +238,12 @@ def update_like():
         return redirect(url_for("home"))
 
 
-
 # 게시물 상세페이지 보여주기
 @app.route('/pic_detail', methods=['GET'])
 def showing():
     post = list(db.post.find({}, {'_id': False}))
 
     return render_template("detail.html", post=post)
-
 
 
 if __name__ == '__main__':
