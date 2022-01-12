@@ -96,15 +96,19 @@
                 url: "/sign_in",
                 data: {
                     username_give: username,
-                    password_give: password
+                    password_give: password,
+
                 },
                 success: function (response) {//성공하면
+                    let access_token = response['token']
+
                     if (response['result'] == 'success') {
                         $.cookie('mytoken', response['token'], {path: '/'});//토큰을 받아서 브라우저에 쿠키로 저장
                         window.location.replace("/")
                     } else {
                         alert(response['msg'])
                     }
+                    console.log(response)
                 }
             });
         }
@@ -129,9 +133,16 @@
                 $("#input-password").focus()
                 return;
             } else if (!is_password(password)) {
-                $("#help-password").text("비밀번호의 형식을 확인해주세요. 영문과 숫자 필수 포함, 특수문자(!@#$%^&*) 사용가능 8-20자").removeClass("is-safe").addClass("is-danger")
-                $("#input-password").focus()
-                return
+
+                if (!is_password(password) && password.length === password) {
+                    $("#help-password").text("아이디와 같은 비밀번호입니다! ").removeClass("is-safe").addClass("is-danger")
+                )
+                    $("#input-password").focus()
+                } else {
+                    $("#help-password").text("비밀번호의 형식을 확인해주세요. 영문과 숫자 필수 포함, 특수문자(!@#$%^&*) 사용가능 8-20자").removeClass("is-safe").addClass("is-danger")
+                    $("#input-password").focus()
+                }
+                return;
             } else {
                 $("#help-password").text("사용할 수 있는 비밀번호입니다.").removeClass("is-danger").addClass("is-success")
             }
@@ -171,12 +182,12 @@
         }
 
         function is_nickname(asValue) {
-            var regExp = /^(?=.*[a-zA-Z])[-a-zA-Z0-9_.]{2,10}$/;
+            let regExp = /^(?=.*[a-zA-Z])[-a-zA-Z0-9_.]{2,10}$/;
             return regExp.test(asValue);
         }
 
         function is_password(asValue) {
-            var regExp = /^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%^&*]{8,20}$/;
+            let regExp = /^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%^&*]{8,20}$/;
             return regExp.test(asValue);
         }
 
