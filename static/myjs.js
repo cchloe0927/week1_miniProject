@@ -22,7 +22,7 @@ function listing(username) {
                     let count_heart = post['count_heart']
                     let temp_html = `<div class="card" id="${post["_id"]}">
                                                 <div class="pic" >
-                                                    <img src="../static/place_pic/${place_pic}" onclick="location.href = '/'">
+                                                    <img src="../static/place_pic/${place_pic}" onclick="this_post()">
                                                          <div class="level-left"><div class="name"> <strong>${profile_name}</strong>&nbsp;<small>${time_before}</small></div>&nbsp;
                                                               <a class="level-item is-sparta" aria-label="heart" onclick="toggle_like('${post['_id']}', 'heart')">
                                                                    <span class="icon is-small"><i class="fa ${class_heart}" aria-hidden="true"></i></span>&nbsp;<span class="like-num">${num2str(count_heart)}</span>
@@ -31,7 +31,6 @@ function listing(username) {
                                                     </nav>
                                                 </div>
                                          </div>`
-
                     $('#post-box').append(temp_html)
                 }
             }
