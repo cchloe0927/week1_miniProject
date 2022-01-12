@@ -198,8 +198,10 @@
                             let post = posts[i]
                             let place_pic = post['place_pic']
                             let profile_name = post['profile_name']
+
                             let time_post = new Date(post["date"])
                             let time_before = time2str(time_post)
+
                             let class_heart = post['heart_by_me'] ? "fa-heart" : "fa-heart-o" //class_heart는 첫번쨰항이 true면 fa-heart이고 false면 fa-heart-o이다
                             let count_heart = post['count_heart']
                             let temp_html = `<div class="card" id="${post["_id"]}">
