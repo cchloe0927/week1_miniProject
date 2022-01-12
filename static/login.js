@@ -61,10 +61,14 @@ function sign_up() {
         $("#help-password").text("비밀번호를 입력해주세요.").removeClass("is-safe").addClass("is-danger")
         $("#input-password").focus()
         return;
-    } else if (!is_password(password) && password.length === username) {
+    } else if (password === username) {
         $("#help-password").text("아이디와 같은 비밀번호 입니다").removeClass("is-safe").addClass("is-danger")
         $("#input-password").focus()
         return alert('아이디와 같은 비밀번호입니다')
+    } else if (!is_password(password)) {
+        $("#help-password").text("비밀번호의 형식을 확인해주세요. 영문과 숫자 필수 포함,8-20자,특수문자(!@#$%^&*) 사용가능입니다").removeClass("is-safe").addClass("is-danger")
+        $("#input-password").focus()
+
     } else {
         $("#help-password").text("사용할 수 있는 비밀번호입니다.").removeClass("is-danger").addClass("is-success")
     }
