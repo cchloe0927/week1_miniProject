@@ -109,31 +109,27 @@
             });
         }
 
-        $(document).ready(function () {
-            listing()
-        })
-
-        function this_post() { //디테일로 이동하는 함수
-            location.href = "/"
-        }
 
 
         function listing() { //전체게시물 보여주기
-
+            let posts
             $.ajax({
                 type: "GET",
                 url: "/listing",
+                async: false,
                 data: {},
                 success: function (response) {
-                    let posts = response['posts']
+                    posts = response['posts']
                     for (let i = 0; i < posts.length; i++) {
                         {#let username = posts[i]['username']#}
                         let place_pic = posts[i]['place_pic']
-
-                        let temp_html = `<div class="card">
-                                                <div class="pic" onclick="this_post()">
-                                                    <img src="../static/place_pic/${place_pic} ">
+                        let contents = posts[i]['contents']
+                        let pic_id = posts[i]['_id']
+                        let temp_html = `<div class="card" id="${pic_id}" onclick="this_post(this.id)">
+                                                <div class="pic" >
+                                                    <img src="../static/place_pic/${place_pic}" alt="">
                                                 </div>
+                                                <p>${contents}</p>
                                          </div>`
 
                         $('#post-box').append(temp_html)
@@ -141,7 +137,19 @@
                 }
             });
         }
+        function this_post(posts) { //디테일로 이동하는 함수
+            console.log(posts)
+            window.location.href = "/detail"
+            $.ajax({
+                type: "POST",
+                url: "/detail",
+                data: {posts_give : posts},
+                success: function (response) {
+                    console.log(response)
+                }
+            });
 
+        }
     </script>
 </head>
 
