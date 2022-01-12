@@ -1,168 +1,159 @@
 <!doctype html>
 <html lang="en">
-    <head>
+<head>
 
-        <!-- Webpage Title -->
-        <title>{{ user_info.name }} | week1 미니프로젝트</title>
+    <!-- Webpage Title -->
+    <title>{{ user_info.name }} | 그 해 우리는 어디를 갔을까</title>
 
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <!-- Bulma CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-        <!-- Font Awesome CSS -->
-        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- Font Awesome CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-        <!-- JS -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-
-
-
-
-        <style>
-            body {
-                background-color: white;
-                min-height: 100vh;
-                padding-top: 3.25rem;
-            }
-
-            .section {
-                padding: 1rem 1.5rem;
-                max-width: 750px;
-                margin: auto;
-                margin-top: 40px;
-            }
-
-            .title {
-                color: black;
-            }
-
-            .button.is-sparta.is-outlined {
-                margin-right: 340px;
-            }
-
-            .modal-content {
-                width: 600px;
-                max-width: 80%;
-            }
-
-            input::-webkit-calendar-picker-indicator {
-                display: none;
-            }
-
-            .image img {
-                object-fit: cover;
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-
-        <script>
-            {#메인페이지와 다른게 usename을 받아와서 gdt_posts를 불러와야함#}
-            $(document).ready(function () {
-                get_posts('{{ user_info.username }}');
-            })
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <!-- myjs.js 임포트 -->
+    <script src="{{ url_for('static', filename='myjs.js') }}"></script>
 
 
-            {#로그아웃 기능#}
-            function sign_out() {
-                $.removeCookie('mytoken', {path: '/'});  {#쿠키를 지워주는 함수#}
-                alert('로그아웃!')
-                window.location.href = "/login"  {#로그인페이지로 이동#}
-            }
+    <style>
+        body {
+            background-color: white;
+            min-height: 100vh;
+            padding-top: 3.25rem;
+        }
 
-            {#프로필 수정 기능#}
-            function update_profile() {
-                let name = $('#input-name').val()
-                let file = $('#input-pic')[0].files[0]
-                let about = $("#textarea-about").val()
-                let form_data = new FormData()
-                form_data.append("file_give", file)
-                form_data.append("name_give", name)
-                form_data.append("about_give", about)
-                console.log(name, file, about, form_data)
+        .section {
+            padding: 1rem 1.5rem;
+            max-width: 750px;
+            margin: auto;
+            margin-top: 40px;
+        }
 
-                $.ajax({
-                    type: "POST",
-                    url: "/update_profile",
-                    data: form_data,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    success: function (response) {
-                        if (response["result"] == "success") {
-                            alert(response["msg"])
-                            window.location.reload()
+        .title {
+            color: black;
+        }
 
-                        }
+        .button.is-sparta.is-outlined {
+            margin-right: 340px;
+        }
+
+        .modal-content {
+            width: 600px;
+            max-width: 80%;
+        }
+
+        input::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+        .image img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+    <script>
+        // {#메인페이지와 다른게 usename을 받아와서 listing을 불러와야함#}
+        $(document).ready(function () {
+            listing('{{ user_info.username }}');
+        })
+
+        function update_profile() {
+            let name = $('#input-name').val()
+            let file = $('#input-pic')[0].files[0]    //프로필 파옴
+            let about = $("#textarea-about").val()    //자기소개 칸
+            let form_data = new FormData()
+            form_data.append("file_give", file)
+            form_data.append("name_give", name)
+            form_data.append("about_give", about)
+            console.log(name, file, about, form_data)
+
+            $.ajax({
+                type: "POST",
+                url: "/update_profile",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        alert(response["msg"])
+                        window.location.reload()
+
                     }
-                });
-            }
-        </script>
-    </head>
+                }
+            });
+        }
+    </script>
+</head>
 
 
-    <body class="has-navbar-fixed-top">
-    {#상단의 타이틀 바#}
-    <nav class="navbar is-fixed-top is-info" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <a class="navbar-item" href="/">
-                <strong class="title"
-                        style="font-family:'Stylish', sans-serif; font-size: larger;">그해 우리는 어디에 갔을까?</strong>
-            </a>
-        </div>
-    </nav>
-     {#프로필 + 자기소개#}
-    <section class="section">
-        {#프로필 파일 + 자기소개텍스트#}
-        <div>
-            <article class="media">
-                <figure class="media-left" style="align-self: center">
-                    <a class="image is-96x96" href="#">
-                        <img class="is-rounded" src="{{ url_for('static', filename=user_info.profile_pic_real) }}">
-                    </a>
-                </figure>
-                <div class="media-content">
-                    <div class="content">
-                        <p>
-                            <strong>{{ user_info.profile_name }}</strong> <small>@{{ user_info.username }}</small>
-                            <br>
-                            {{ user_info.profile_info }}
-                        </p>
-                    </div>
-                    {#프로필 수정버튼 + 로그아웃버튼#}
-                    {% if status %}  {#status로 유저가 자신일때만 보여주게 하기#}
-                        <nav id="btns-me" class="level is-mobile" style="margin-top:2rem">
+<body class="has-navbar-fixed-top">
+{#상단의 타이틀 바#}
+<nav class="navbar is-fixed-top is-info" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+            <strong class="title"
+                    style="font-family:'Stylish', sans-serif; font-size: larger;">그해 우리는 어디에 갔을까?</strong>
+        </a>
+    </div>
+</nav>
+{#프로필 + 자기소개#}
+<section class="section">
+    {#프로필 파일 + 자기소개텍스트#}
+    <div>
+        <article class="media">
+            <figure class="media-left" style="align-self: center">
+                <a class="image is-96x96" href="#">
+                    <img class="is-rounded" src="{{ url_for('static', filename=user_info.profile_pic_real) }}">
+                </a>
+            </figure>
+            <div class="media-content">
+                <div class="content">
+                    <p>
+                        <strong>{{ user_info.profile_name }}</strong> <small>@{{ user_info.username }}</small>
+                        <br>
+                        {{ user_info.profile_info }}
+                    </p>
+                </div>
+                {#프로필 수정버튼 + 로그아웃버튼#}
+                {% if status %}  {#status로 유저가 자신일때만 보여주게 하기#}
+                    <nav id="btns-me" class="level is-mobile" style="margin-top:2rem">
                         <button onclick='$("#modal-edit").addClass("is-active")' class="button is-info is-sparta">프로필 수정
                             &nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-pencil"
-                                                                                   aria-hidden="true"></i></span>
+                                                                       aria-hidden="true"></i></span>
                         </button>
                         <button onclick="sign_out()" class="button is-info is-outlined is-sparta">로그아웃
                             &nbsp;&nbsp;<span class="icon is-small"><i
-                                class="fa fa-sign-out" aria-hidden="true"></i></span>
+                                    class="fa fa-sign-out" aria-hidden="true"></i></span>
                         </button>
                     </nav>
-                    {% endif %}
-                </div>
-            </article>
-        </div>
-        {#프로필 수정하기 모달#}
-        {% if status %}   {#status로 유저가 자신일때만 보여주게 하기#}
-            <div class="modal" id="modal-edit">
+                {% endif %}
+            </div>
+        </article>
+    </div>
+    {#프로필 수정하기 모달#}
+    {% if status %}   {#status로 유저가 자신일때만 보여주게 하기#}
+        <div class="modal" id="modal-edit">
             <div class="modal-background" onclick='$("#modal-edit").removeClass("is-active")'></div>
             <div class="modal-content">
                 <div class="box">
                     <article class="media">
                         <div class="media-content">
                             <div class="field">
-                        <label class="label" for="input-name">이름</label>
-                        <p class="control">
-                            <input id="input-name" class="input"
-                                   placeholder="" value="{{ user_info.profile_name }}">
-                        </p>
-                    </div>
+                                <label class="label" for="input-name">이름</label>
+                                <p class="control">
+                                    <input id="input-name" class="input"
+                                           placeholder="" value="{{ user_info.profile_name }}">
+                                </p>
+                            </div>
                             <div class="field">
                                 <label class="label" for="input-pic">프로필 사진</label>
                                 <div class="control is-expanded">
@@ -192,7 +183,7 @@
                                 </div>
                                 <div class="level-right">
                                     <div class="level-item">
-                                        <a class="button is-info" onclick="update_profile()">업데이트</a>
+                                        <a class="button is-sparta" onclick="update_profile()">업데이트</a>
                                     </div>
                                     <div class="level-item">
                                         <a class="button is-info is-outlined"
@@ -207,28 +198,33 @@
             <button class="modal-close is-large" aria-label="close"
                     onclick='$("#modal-edit").removeClass("is-active")'></button>
         </div>
-        {% endif %}
-    </section>
-    <section class="section">
-        <div id="post-box" class="container">
-            <div>
-                <div class="media-content">
-                    <figure class="image is-128x128">
-                        <img src="https://bulma.io/images/placeholders/256x256.png">
-                    </figure>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item is-sparta" aria-label="heart"
-                               onclick="toggle_like('', 'heart')">
-                                  <span class="icon is-small"><i class="fa fa-heart"
-                                                                 aria-hidden="true"></i></span>&nbsp;<span
-                                    class="like-num">2.7k</span>
-                            </a>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-        </div>  {#게시글 리스트 : 메인페이지에서 받아온 게시글 업로드 (추후 수정)#}
-    </section>
-    </body>
+    {% endif %}
+</section>
+{#게시글 리스트 : 메인페이지에서 받아온 게시글 업로드 (추후 수정)#}
+<section class="section">
+    <div id="post-box">
+    </div>
+</section>
+{#    <section class="section">#}
+{#        <div id="post-box" class="container">#}
+{#            <div>#}
+{#                <div class="media-content">#}
+{#                    <figure class="image is-128x128">#}
+{#                        <img src="https://bulma.io/images/placeholders/256x256.png">#}
+{#                    </figure>#}
+{#                    <nav class="level is-mobile">#}
+{#                        <div class="level-left">#}
+{#                            <a class="level-item is-sparta" aria-label="heart"#}
+{#                               onclick="toggle_like('', 'heart')">#}
+{#                                  <span class="icon is-small"><i class="fa fa-heart"#}
+{#                                                                 aria-hidden="true"></i></span>&nbsp;<span#}
+{#                                    class="like-num">2.7k</span>#}
+{#                            </a>#}
+{#                        </div>#}
+{#                    </nav>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </section>#}
+</body>
 </html>

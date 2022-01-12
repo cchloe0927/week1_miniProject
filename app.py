@@ -161,7 +161,7 @@ def posting():
         }
 
         db.posts.insert_one(doc)
-        return jsonify({"result": "success", 'msg': '포스팅 성공~'})
+        return jsonify({"result": "success", 'msg': '포스팅 성공!'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
@@ -171,9 +171,11 @@ def listing():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-
         username_receive = request.args.get("username_give")
-        posts = list(db.posts.find({}).sort("date", -1))
+        if username_receive == "":
+            posts = list(db.posts.find({}).sort("date", -1).limit(20))
+        else:
+            posts = list(db.posts.find({"username": username_receive}).sort("date", -1).limit(20))
         for post in posts:
             post["_id"] = str(post["_id"])
             post["count_heart"] = db.likes.count_documents({"post_id": post["_id"], "type": "heart"})#해당 글의 like 갯수를 파악
@@ -204,6 +206,7 @@ def update_like():
             db.likes.delete_one(doc)
 
         count = db.likes.count_documents({"post_id": post_id_receive, "type": type_receive})  # 동작 완료 후 좋아요 개수 확인해서
+        db.posts.update({"post_id": post_id_receive}, {"$set": {"likeCount": count}})
         return jsonify({"result": "success", 'msg': 'updated', "count": count})  # 클라이언트로 넘겨줌
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
