@@ -18,7 +18,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-
     <style>
         body {
             background-color: skyblue;
@@ -206,7 +205,7 @@
                             let count_heart = post['count_heart']
                             let temp_html = `<div class="card" id="${post["_id"]}">
                                                 <div class="pic" >
-                                                    <img src="../static/place_pic/${place_pic}" onclick="location.href = '/'">
+                                                    <img src="../static/place_pic/${place_pic}" id="${post["_id"]}" onclick="this_post(this.id)">
                                                          <div class="level-left"><div class="name"> <strong>${profile_name}</strong>&nbsp;<small>${time_before}</small></div>&nbsp;
                                                               <a class="level-item is-sparta" aria-label="heart" onclick="toggle_like('${post['_id']}', 'heart')">
                                                                    <span class="icon is-small"><i class="fa ${class_heart}" aria-hidden="true"></i></span>&nbsp;<span class="like-num">${num2str(count_heart)}</span>
@@ -221,6 +220,22 @@
                     }
                 }
             });
+        }
+
+        function this_post(posts) { //디테일로 이동하는 함수
+            console.log(posts)
+            $("body").empty()
+            $.ajax({
+                type: "POST",
+                url: "/detail",
+                data: {posts_give: posts},
+                success: function (response) {
+                    console.log(response)
+                    $('body').append(response)
+                    {#window.location.href = "/detail"#}
+                }
+            });
+
         }
     </script>
 
@@ -312,7 +327,7 @@
 <section class="section">
     <div id="post-box" class="container">
         <div class="card">
-            <div class="pic" onclick="location.href = '/'">
+            <div class="pic" onclick="location.href = '/detail.html'">
                 <img src="https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fb2rbPt%2Fbtqy0FJgja1%2FgBn90IqzhQj3wT1axgAiiK%2Fimg.jpg">
                 <nav class="level is-mobile">
 
@@ -328,10 +343,9 @@
                     </div>
                 </nav>
             </div>
-            </nav>
         </div>
     </div>
-    </div>
 </section>
+
 </body>
 </html>
