@@ -31,6 +31,7 @@
             alert('로그아웃!')
             window.location.href = "/login"
         }
+
     </script>
 
 </head>
@@ -57,19 +58,28 @@
         <p class="show_like">{{ pass_pic['username'] }} </p>
         <p class="show_comment">comment : {{ pass_pic['contents'] }}</p>
     </section>
-</div>
-<!-- footer -->
-<footer class="footer">
-    <div class="content has-text-centered">
-        <p>
-            <strong>그해 우리는</strong> by 6조
-        </p>
-        <p>이현정</p>
-        <p>최창용</p>
-        <p>이재정</p>
-        <p>박효준</p>
-    </div>
-</footer>
+{#    <div class="likes">#}
+{#        <p>좋아요 20개</p>#}
+{#        <div class="text">#}
+{#            <p><a href="">#sparta</a></p>#}
+{#        </div>#}
+{#        <div class="comment">#}
+{#            <input type="text" id="comment_input" class="comment-input" placeholder="댓글 달기.."/>#}
+{#            <button id="comment-post" onclick="make_comment()">게시</button>#}
+{#        </div>#}
+{#    </div>#}
+    <!-- footer -->
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>
+                <strong>그해 우리는</strong> by 6조
+            </p>
+            <p>이현정</p>
+            <p>최창용</p>
+            <p>이재정</p>
+            <p>박효준</p>
+        </div>
+    </footer>
 </body>
 </html>
 
