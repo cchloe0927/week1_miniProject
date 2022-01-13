@@ -14,7 +14,8 @@
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <!-- 구글폰트 적용 -->
+    <link href="https://fonts.googleapis.com/css2?family=Sunflower:wght@300&display=swap" rel="stylesheet">
 
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -24,8 +25,14 @@
     <script src="{{ url_for('static', filename='login.js') }}"></script>
 </head>
 <style>
+    * {
+        font-family: 'Sunflower', sans-serif;
+    }
+
     html, body {
         margin: 0;
+
+
     }
 
     .main-container {
@@ -41,7 +48,7 @@
     }
 
     .image-container {
-        width: 50%;
+        width: 100%;
         display: flex;
 
     }
@@ -99,6 +106,27 @@
         text-align: center;
         margin: auto;
     }
+
+    .btn-text {
+        color: #88CEEB
+        width: 100%;
+    }
+
+    .btn-text:hover {
+        color: black;
+    }
+
+    .btn-text-container {
+        background-color: transparent;
+    }
+
+    .btn-text-container:hover {
+        color: black;
+    }
+
+    .mb-3 {
+        color: #88CEEB !important;
+    }
 </style>
 <body>
 <div class="main-container container">
@@ -111,7 +139,7 @@
                             <div class="image">
                                 <h1 class="text-placeholder">그해 우리는..</h1>
 
-                                
+
                             </div>
                         </div>
                         <div class="login-container container">
@@ -136,7 +164,9 @@
                                                         <div id="btn-check-dup"
                                                              class="control is-hidden">
                                                             <button class="button is-sparta"
-                                                                    onclick="check_dup()">중복확인
+                                                                    onclick="check_dup()">
+                                                                <div class="btn-text-container"><p class="btn-text">
+                                                                    중복확인</p></div>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -167,7 +197,8 @@
                                                     <nav class="level is-mobile">
                                                         <button class="level-item button is-sparta"
                                                                 onclick="sign_in()">
-                                                            로그인
+                                                            <div class="btn-text-container"><p class="btn-text">로그인</p>
+                                                            </div>
                                                         </button>
                                                     </nav>
                                                     <hr>
@@ -175,7 +206,8 @@
                                                     <nav class="level is-mobile">
                                                         <button class="level-item button is-sparta is-outlined"
                                                                 onclick="toggle_sign_up()">
-                                                            회원가입하기
+                                                            <div class="btn-text-container"><p class="btn-text">
+                                                                회원가입하기</p></div>
                                                         </button>
                                                     </nav>
                                                 </div>
@@ -200,11 +232,14 @@
                                                     </div>
                                                     <nav class="level is-mobile">
                                                         <button class="level-item button is-sparta"
-                                                                onclick="sign_up()">회원가입
+                                                                onclick="sign_up()">
+                                                            <div class="btn-text-container"><p class="btn-text">회원가입</p>
+                                                            </div>
                                                         </button>
                                                         <button class="level-item button is-sparta is-outlined"
                                                                 onclick="toggle_sign_up()">
-                                                            취소
+                                                            <div class="btn-text-container"><p class="btn-text">취소</p>
+                                                            </div>
                                                         </button>
                                                     </nav>
                                                 </div>

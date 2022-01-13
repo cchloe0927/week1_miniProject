@@ -1,7 +1,14 @@
+* {
+    font-family: 'Sunflower', sans-serif;
+}
 
 body {
     background-color: #88CEEB;
     min-height: 100vh;
+}
+
+.input {
+    font-family: 'Sunflower';
 }
 
 .section {
@@ -21,20 +28,34 @@ body {
     font-family: 'Jua', sans-serif;
 }
 
-.is-sparta {
-    color: #e8344e !important;
-}
 
 .button.is-sparta {
-    background-color: #e8344e;
+    background-color: transparent;
+    border-color: #CDDEFF;
+    color: #88CEEB !important;
+    font-family: 'Sunflower', sans-serif;
+
+}
+
+.button.is-sparta:hover {
     border-color: transparent;
-    color: #fff !important;
+    background-color: #88CEEB;
+    color: black;
+    font-family: 'Sunflower';
 }
 
 .button.is-sparta.is-outlined {
     background-color: transparent;
-    border-color: #e8344e;
-    color: #e8344e !important;
+    border-color: #CDDEFF;
+    color: #88CEEB !important;
+    font-family: 'Sunflower', sans-serif;
+}
+
+.button.is-sparta.is-outlined:hover {
+    border-color: transparent;
+    background-color: #88CEEB;
+    color: black;
+    font-family: 'Sunflower';
 }
 
 .help {
