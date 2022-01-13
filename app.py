@@ -230,6 +230,7 @@ def update_like():
             db.likes.delete_one(doc)
         count = db.likes.count_documents({"post_id": post_id_receive, "type": type_receive})  # 동작 완료 후 좋아요 개수 확인해서
         return jsonify({"result": "success", "count": count})  # 클라이언트로 넘겨줌
+
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
@@ -251,6 +252,24 @@ def update_like():
 #         return redirect(url_for("home"))
 
 # 게시물 상세페이지 보여주기
+
+@app.route('/detail', methods=['POST'])
+def detail():
+    posts_receive = request.form['posts_give']
+    print(posts_receive)
+    search_post = list(db.posts.find({}))
+    print(search_post)
+    for post in search_post:
+        post["_id"] = str(post["_id"])
+        if posts_receive == post['_id']:
+            username = post['username']
+            place_pic = post['place_pic']
+            contents = post['contents']
+
+            pass_pic = {'username': username, 'place_pic': place_pic, 'contents': contents}
+            print(pass_pic)
+            return render_template("detail.html", pass_pic=pass_pic)
+
 @app.route('/detail/<num>')
 def detail(num):
     try:
@@ -259,6 +278,7 @@ def detail(num):
         return render_template("detail.html", search_post=search_post)
     except ():
         return redirect(url_for("index"))
+
 
 
 if __name__ == '__main__':
