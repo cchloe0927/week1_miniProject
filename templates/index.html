@@ -22,63 +22,53 @@
     <script src="{{ url_for('static', filename='myjs.js') }}"></script>
 
 
-    <style>
+  <style>
         body {
             background-color: skyblue;
             min-height: 100vh;
             padding-top: 3.25rem;
         }
-
         .section {
             padding: 1rem 1.5rem;
-            max-width: 750px;
+            max-width: 1000px;
             margin: auto;
         }
-
         .is-sparta {
             color: #05899d !important;
         }
-
         .button.is-sparta {
             background-color: #05899d;
             border-color: transparent;
             color: #fff !important;
         }
-
         .button.is-sparta.is-outlined {
             background-color: transparent;
             border-color: #05899d;
             color: #05899d !important;
         }
-
         .modal-content {
             width: 600px;
             max-width: 80%;
         }
-
         input::-webkit-calendar-picker-indicator {
             display: none;
         }
-
         .image img {
             object-fit: cover;
             width: 100%;
             height: 100%;
         }
-
         .card {
-            padding: 30px;
+            padding: 10px;
+            display: flex;    /*가로 정렬*/
+            flex-wrap: wrap;  /*정렬 된 요소들의 총 넓이가 부모 넓이 보다 클 때 이 요소들을 다음 중에 이어서 나열해주는 기능*/
+            float: left;      /*왼쪽 부터 나열*/
         }
+       .container {
+           width: 1000px;
+           margin-top: 50px;
+       }
 
-        .pic {
-            padding: 20px;
-        }
-
-        .image img {
-            object-fit: cover;
-            width: 100%;
-            height: 100%;
-        }
 
 
     </style>
@@ -112,23 +102,6 @@
                     window.location.reload()
                 }
             });
-        }
-
-
-        function this_post(posts) { //디테일로 이동하는 함수
-            console.log(posts)
-            $("body").empty()
-            $.ajax({
-                type: "POST",
-                url: "/detail",
-                data: {posts_give: posts},
-                success: function (response) {
-                    console.log(response)
-                    $('body').append(response)
-                    {#window.location.href = "/detail"#}
-                }
-            });
-
         }
     </script>
 </head>
@@ -220,7 +193,6 @@
 </section>
 <section class="section">
     <div id="post-box" class="container">
-
     </div>
 </section>
 

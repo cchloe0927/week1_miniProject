@@ -156,6 +156,7 @@ def posting():
 
         # 포스팅하기
         user_info = db.users.find_one({"username": payload["id"]})
+        username = user_info["username"]
         contents_receive = request.form["contents_give"]
         place_pic = request.files["place_pic_give"]
         date_receive = request.form["date_give"]
@@ -164,7 +165,9 @@ def posting():
         extension = filename.split('.')[-1]
         today = datetime.now()
         mytime = today.strftime('%Y%m%d%H%M%S')
+        ms = today.strftime('%H%M%S')
 
+        num = f'{username}{ms}'
         picname = f'place_pic-{mytime}'
         save_to = f'static/place_pic/{picname}.{extension}'
 
@@ -175,7 +178,8 @@ def posting():
             "profile_name": user_info["profile_name"],
             "contents": contents_receive,
             "place_pic": f'{picname}.{extension}',
-            "date": date_receive
+            "date": date_receive,
+            "num": num
         }
 
         db.posts.insert_one(doc)
@@ -192,9 +196,9 @@ def listing():
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         username_receive = request.args.get("username_give")
         if username_receive == "":
-            posts = list(db.posts.find({}).sort("date", -1).limit(20))
+            posts = list(db.posts.find({}).sort("date", -1))
         else:
-            posts = list(db.posts.find({"username": username_receive}).sort("date", -1).limit(20))
+            posts = list(db.posts.find({"username": username_receive}).sort("date", -1))
         for post in posts:
             post["_id"] = str(post["_id"])
             post["count_heart"] = db.likes.count_documents(
@@ -218,21 +222,37 @@ def update_like():
         doc = {
             "post_id": post_id_receive,
             "username": user_info["username"],
-            "type": type_receive
+            "type": type_receive,
         }
         if action_receive == "like":  # 실행하는거면 저장
             db.likes.insert_one(doc)
         else:  # 아니면 삭제
             db.likes.delete_one(doc)
-
         count = db.likes.count_documents({"post_id": post_id_receive, "type": type_receive})  # 동작 완료 후 좋아요 개수 확인해서
+        return jsonify({"result": "success", "count": count})  # 클라이언트로 넘겨줌
 
-        return jsonify({"result": "success", 'msg': 'updated', "count": count})  # 클라이언트로 넘겨줌
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
+# @app.route('/detail_likes', methods=['GET'])
+# def get_likes():
+#     token_receive = request.cookies.get('mytoken')
+#     try:
+#         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+#         num_receive = request.args.get("num_give")
+#         posts = db.posts.find_one({"num": num_receive})
+#         for post in posts:
+#             post["_id"] = str(post["_id"])
+#             post["count_heart"] = db.likes.count_documents(
+#             {"post_id": post["_id"], "type": "heart"})  # 해당 글의 like 갯수를 파악
+#             post["heart_by_me"] = bool(db.likes.find_one({"post_id": post["_id"], "type": "heart", "username": payload[
+#             'id']}))  # jwt토큰을 확인해서 username을 꺼내고 like타입을 확인해서 해당 게시글에 내 정보가 있으면 내가 좋아요를 눌렀는지 알게 됨
+#         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "posts": posts})
+#     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+#         return redirect(url_for("home"))
 
 # 게시물 상세페이지 보여주기
+
 @app.route('/detail', methods=['POST'])
 def detail():
     posts_receive = request.form['posts_give']
@@ -249,6 +269,16 @@ def detail():
             pass_pic = {'username': username, 'place_pic': place_pic, 'contents': contents}
             print(pass_pic)
             return render_template("detail.html", pass_pic=pass_pic)
+
+@app.route('/detail/<num>')
+def detail(num):
+    try:
+        search_post = db.posts.find_one({'num': num})
+
+        return render_template("detail.html", search_post=search_post)
+    except ():
+        return redirect(url_for("index"))
+
 
 
 if __name__ == '__main__':
