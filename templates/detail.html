@@ -1,67 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>그해 우리는..</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>그해 우리는..</title>
 
-        <!-- Bulma CSS 링크 -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-        <link rel="stylesheet" href="../static/detail.css">
-        <!-- 구글폰트 적용 -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Sunflower:wght@300&display=swap" rel="stylesheet">
+    <!-- Bulma CSS 링크 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="../static/detail.css">
+    <!-- 구글폰트 적용 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Sunflower:wght@300&display=swap"
+          rel="stylesheet">
 
-        <!-- 폰트어썸 -->
-        <script src="https://kit.fontawesome.com/6478f529f2.js" crossorigin="anonymous"></script>
+    <!-- 폰트어썸 -->
+    <script src="https://kit.fontawesome.com/6478f529f2.js" crossorigin="anonymous"></script>
 
-        <!-- JS -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-                crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-        <script src="../static/detail.js"></script>
-        <script>
 
-        </script>
-    </head>
-    <body>
-        <div class="wrapper">
-            <!-- nav bar -->
-            <!-- Main container -->
-            <nav class="level">
-              <!-- Left side -->
-              <div class="level-left">
-                <p class="level-item"><i class="fas fa-car-side fa-2x"></i></p>
-                <p class="level-item"><span>그해 우리는...</span></p>
-              </div>
+    <script>
+        $(document).ready(function () {
+            get_likes()
 
-              <!-- Right side -->
-              <div class="level-right">
-                <p class="level-item"><a onclick="window.location.href='/'">마이페이지</a></p>
-                <p class="level-item"><a onclick="sign_out()">로그아웃</a></p>
-              </div>
-            </nav>
-            <!-- 사진부분 -->
-            <section class="section" id="pic-box">
-                    <img src="{{ post[0]['img_url'] }}" alt={{ post[0]['comment'] }}>
-                    <p class="show_like">like : {{ post[0]['like'] }} </p>
-                    <p class="show_comment">comment : {{ post[0]['comment'] }}</p>
-            </section>
+        })
+
+        function sign_out() {//로그아웃 버튼을 누르면
+            $.removeCookie('mytoken', {path: '/'});//쿠키를 브라우저에서 삭제
+            alert('로그아웃!')
+            window.location.href = "/login"
+        }
+
+        function get_likes(num) { //deatail에서 좋아요 나타내기
+            $.ajax({
+                type: "GET",
+                url: `/detail_likes?num_give=${num}`,
+                data: {},
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        let posts = response['posts']
+                        for (let i = 0; i < posts.length; i++) {
+                            let post = posts[i]
+                            let profile_name = post['profile_name']
+                            let time_post = new Date(post["date"])
+                            let time_before = time2str(time_post)
+
+                            let class_heart = post['heart_by_me'] ? "fa-heart" : "fa-heart-o" //class_heart는 첫번쨰항이 true면 fa-heart이고 false면 fa-heart-o이다
+                            let count_heart = post['count_heart']
+                            let temp_html = `  <div class="level-left"><div class="name"> <strong>${profile_name}</strong>&nbsp;<small>${time_before}</small></div>&nbsp;
+                                                            <a class="level-item is-sparta" aria-label="heart" onclick="toggle_like('${post['_id']}', 'heart')">
+                                                                   <span class="icon is-small"><i class="fa ${class_heart}" aria-hidden="true"></i></span>&nbsp;<span class="like-num">${num2str(count_heart)}</span>
+                                                              </a>`
+
+                            $('#like-box').append(temp_html)
+
+                        }
+                    }
+                }
+            })
+        }
+
+
+        function num2str(count) {
+            if (count > 10000) {
+                return parseInt(count / 1000) + "k"
+            }
+            if (count > 500) {
+                return parseInt(count / 100) / 10 + "k"
+            }
+            if (count == 0) {
+                return ""
+            }
+            return count
+        }
+
+        function time2str(date) {
+            let today = new Date()
+            let time = (today - date) / 1000 / 60  // 분
+
+            if (time < 60) {
+                return parseInt(time) + "분 전"
+            }
+            time = time / 60  // 시간
+            if (time < 24) {
+                return parseInt(time) + "시간 전"
+            }
+            time = time / 24
+            if (time < 7) {
+                return parseInt(time) + "일 전"
+            }
+            return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
+        }
+
+        function toggle_like(post_id, type) {
+            console.log(post_id, type)
+            let $a_like = $(`#${post_id} a[aria-label='heart']`)
+            let $i_like = $a_like.find("i")
+            if ($i_like.hasClass("fa-heart")) {
+                $.ajax({
+                    type: "POST",
+                    url: "/update_like",
+                    data: {
+                        post_id_give: post_id,
+                        type_give: type,
+                        action_give: "unlike"
+                    },
+                    success: function (response) {
+                        console.log("unlike")
+                        $i_like.addClass("fa-heart-o").removeClass("fa-heart")
+                        $a_like.find("span.like-num").text(response["count"])
+                    }
+                })
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/update_like",
+                    data: {
+                        post_id_give: post_id,
+                        type_give: type,
+                        action_give: "like"
+                    },
+                    success: function (response) {
+                        console.log("like")
+                        $i_like.addClass("fa-heart").removeClass("fa-heart-o")
+                        $a_like.find("span.like-num").text(response["count"])
+                    }
+                })
+
+            }
+        }
+
+    </script>
+
+</head>
+<body>
+<div class="wrapper">
+    <!-- nav bar -->
+    <!-- Main container -->
+    <nav class="level">
+        <!-- Left side -->
+        <div class="level-left">
+            <p class="level-item"><i class="fas fa-car-side fa-2x"></i></p>
+            <p class="level-item"><span>그해 우리는...</span></p>
         </div>
-        <!-- footer -->
-        <footer class="footer">
-          <div class="content has-text-centered">
-            <p>
-              <strong>그해 우리는</strong> by 6조
-            </p>
-            <p>이현정</p><p>최창용</p><p>이재정</p><p>박효준</p>
-          </div>
-        </footer>
-    </body>
+
+        <!-- Right side -->
+        <div class="level-right">
+            <p class="level-item"><a onclick="window.location.href='/'">메인페이지</a></p>
+            <p class="level-item"><a onclick="sign_out()">로그아웃</a></p>
+        </div>
+    </nav>
+    <!-- 사진부분 -->
+    <section class="section" id="pic-box">
+        <img src="../static/place_pic/{{ search_post['place_pic'] }}">
+        <div id="like-box"></div>
+        <p class="show_like">{{ search_post['username'] }} </p>
+        <p class="show_comment">comment : {{ search_post['contents'] }}</p>
+    </section>
+</div>
+<!-- footer -->
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>
+            <strong>그해 우리는</strong> by 6조
+        </p>
+        <p>이현정</p>
+        <p>최창용</p>
+        <p>이재정</p>
+        <p>박효준</p>
+    </div>
+</footer>
+</body>
 </html>
 
 

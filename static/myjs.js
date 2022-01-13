@@ -12,6 +12,7 @@ function listing(username) {
                 let posts = response['posts']
                 for (let i = 0; i < posts.length; i++) {
                     let post = posts[i]
+                    let num = post['num']
                     let place_pic = post['place_pic']
                     let profile_name = post['profile_name']
 
@@ -20,12 +21,12 @@ function listing(username) {
 
                     let class_heart = post['heart_by_me'] ? "fa-heart" : "fa-heart-o" //class_heart는 첫번쨰항이 true면 fa-heart이고 false면 fa-heart-o이다
                     let count_heart = post['count_heart']
-                    let temp_html = `<div class="card" id="${post["_id"]}">
+                    let temp_html = `<div style="margin:10px 0px 10px 20px; width: 18rem;" class="card" id="${post["_id"]}">
                                                 <div class="pic" >
-                                                    <img src="../static/place_pic/${place_pic}" onclick="this_post()">
+                                                    <img style="height: 13rem; object-fit: cover"  src="../static/place_pic/${place_pic}" id="${post["_id"]}" onclick="location.href = '/detail/${num}'">
                                                          <div class="level-left"><div class="name"> <strong>${profile_name}</strong>&nbsp;<small>${time_before}</small></div>&nbsp;
                                                               <a class="level-item is-sparta" aria-label="heart" onclick="toggle_like('${post['_id']}', 'heart')">
-                                                                   <span class="icon is-small"><i class="fa ${class_heart}" aria-hidden="true"></i></span>&nbsp;<span class="like-num">${num2str(count_heart)}</span>
+                                                                   <span style="color: red" class="icon is-small"><i class="fa ${class_heart}" aria-hidden="true"></i></span>&nbsp;<span  style="color: red" class="like-num">${num2str(count_heart)}</span>
                                                               </a>
                                                          </div>
                                                     </nav>
@@ -108,10 +109,6 @@ function toggle_like(post_id, type) {
     }
 }
 
-
-function this_post() { //디테일로 이동하는 함수
-    location.href = "/detail"
-}
 
 
 // {#로그아웃 기능#}
