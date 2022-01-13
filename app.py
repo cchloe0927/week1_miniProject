@@ -10,9 +10,7 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['UPLOAD_FOLDER'] = "./static/profile_pics"
-
 SECRET_KEY = 'SPARTA'
-
 client = MongoClient('localhost', 27017)
 db = client.week1Project
 
@@ -25,7 +23,6 @@ def home():
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.users.find_one({"username": payload["id"]})
         return render_template('index.html', user_info=user_info)
-
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login"))
     except jwt.exceptions.DecodeError:
@@ -47,7 +44,6 @@ def user(username):
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         status = (username == payload["id"])  # 내 프로필이면 True, 다른 사람 프로필 페이지면 False
-
         user_info = db.users.find_one({"username": username}, {"_id": False})
         return render_template('user.html', user_info=user_info, status=status)  # status를 이용해서 프로필 수정 보이기/숨기기
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -61,7 +57,6 @@ def sign_in():
     # id, pw를 받아서 맞춰보고, 토큰을 만들어 발급합니다.
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
-
     # bcrypt로 비밀번호를 해쉬화 한다
     hash_pw = bcrypt.hashpw(password_receive.encode('utf-8'), bcrypt.gensalt())
     hashed_pw = hash_pw.decode('utf-8')
@@ -77,7 +72,6 @@ def sign_in():
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         print(token)
-
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
     else:
@@ -90,11 +84,9 @@ def sign_up():
     # 유저 아이디, 비밀번호 받아오기
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
-
     # bcrypt로 비밀번호를 해쉬화 한다
     hash_pw = bcrypt.hashpw(password_receive.encode("utf-8"), bcrypt.gensalt())
     hashed_pw = hash_pw.decode('utf-8')
-
     # password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
     doc = {
         "username": username_receive,  # 아이디
@@ -105,7 +97,6 @@ def sign_up():
         "profile_info": ""  # 프로필 한 마디
     }
     db.users.insert_one(doc)
-
     return jsonify({'result': 'success'})
 
 
@@ -130,18 +121,15 @@ def save_img():
             "profile_name": name_receive,
             "profile_info": about_receive
         }
-
         if 'file_give' in request.files:
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
             file_path = f"profile_pics/{username}.{extension}"
-
             file.save("./static/" + file_path)
             new_doc["profile_pic"] = filename
             new_doc["profile_pic_real"] = file_path
         db.users.update_one({'username': payload['id']}, {'$set': new_doc})
-
         return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
@@ -153,26 +141,21 @@ def posting():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-
         # 포스팅하기
         user_info = db.users.find_one({"username": payload["id"]})
         username = user_info["username"]
         contents_receive = request.form["contents_give"]
         place_pic = request.files["place_pic_give"]
         date_receive = request.form["date_give"]
-
         filename = secure_filename(place_pic.filename)
         extension = filename.split('.')[-1]
         today = datetime.now()
         mytime = today.strftime('%Y%m%d%H%M%S')
         ms = today.strftime('%H%M%S')
-
         num = f'{username}{ms}'
         picname = f'place_pic-{mytime}'
         save_to = f'static/place_pic/{picname}.{extension}'
-
         place_pic.save(save_to)
-
         doc = {
             "username": user_info["username"],
             "profile_name": user_info["profile_name"],
@@ -181,7 +164,6 @@ def posting():
             "date": date_receive,
             "num": num
         }
-
         db.posts.insert_one(doc)
         return jsonify({"result": "success", 'msg': '포스팅 성공!'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -233,6 +215,7 @@ def update_like():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
+
 # @app.route('/detail_likes', methods=['GET'])
 # def get_likes():
 #     token_receive = request.cookies.get('mytoken')
@@ -249,17 +232,31 @@ def update_like():
 #         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "posts": posts})
 #     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
 #         return redirect(url_for("home"))
-
 # 게시물 상세페이지 보여주기
 @app.route('/detail/<num>')
 def detail(num):
     try:
         search_post = db.posts.find_one({'num': num})
-
         return render_template("detail.html", search_post=search_post)
     except ():
         return redirect(url_for("index"))
 
 
+# @app.route('/detail', methods=['POST'])
+# def detail():
+#     posts_receive = request.form['posts_give']
+#     print(posts_receive)
+#     search_post = list(db.posts.find({}))
+#     print(search_post)
+#     for post in search_post:
+#         post["_id"] = str(post["_id"])
+#         if posts_receive == post['_id']:
+#             username = post['username']
+#             place_pic = post['place_pic']
+#             contents = post['contents']
+#
+#             pass_pic = {'username': username, 'place_pic': place_pic, 'contents': contents}
+#             print(pass_pic)
+#             return render_template("detail.html", pass_pic=pass_pic)
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
