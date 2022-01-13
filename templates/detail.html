@@ -8,11 +8,12 @@
     <!-- Bulma CSS 링크 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" href="../static/detail.css">
+
+    <!-- 메인, 상세, 프로필 CSS 임포트 -->
+    <link href="{{ url_for('static', filename='mystyle.css') }}" rel="stylesheet">
+
     <!-- 구글폰트 적용 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Sunflower:wght@300&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sunflower:wght@300&display=swap" rel="stylesheet">
 
     <!-- 폰트어썸 -->
     <script src="https://kit.fontawesome.com/6478f529f2.js" crossorigin="anonymous"></script>
@@ -143,22 +144,26 @@
 <div class="wrapper">
     <!-- nav bar -->
     <!-- Main container -->
-    <nav class="level">
-        <!-- Left side -->
-        <div class="level-left">
-            <p class="level-item"><i class="fas fa-car-side fa-2x"></i></p>
-            <p class="level-item"><span>그해 우리는...</span></p>
+    <nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img class="" src="{{ url_for('static', filename='logo.png') }}">
+                <strong class="title"
+                        style="font-family: 'Stylish', sans-serif;font-size: larger;">그 해 우리는 어디를 갔을까</strong>
+            </a>
         </div>
-
-        <!-- Right side -->
-        <div class="level-right">
-            <p class="level-item"><a onclick="window.location.href='/'">메인페이지</a></p>
-            <p class="level-item"><a onclick="sign_out()">로그아웃</a></p>
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-link is-outlined" onclick="window.location.href='/'">메인페이지</a>
+                    <a class="button is-link is-outlined" onclick="sign_out()">Log out</a>
+                </div>
+            </div>
         </div>
     </nav>
     <!-- 사진부분 -->
     <section class="section" id="pic-box">
-        <img src="../static/place_pic/{{ search_post['place_pic'] }}">
+        <img style="border: 1px solid black; width: 800px; height: 600px;" src="../static/place_pic/{{ search_post['place_pic'] }}">
         <div id="like-box"></div>
         <p class="show_like">{{ search_post['username'] }} </p>
         <p class="show_comment">comment : {{ search_post['contents'] }}</p>

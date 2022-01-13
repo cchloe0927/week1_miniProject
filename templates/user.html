@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <!-- Font Awesome CSS -->
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 메인, 상세, 프로필 CSS 임포트 -->
+    <link href="{{ url_for('static', filename='mystyle.css') }}" rel="stylesheet">
+    <!-- 구글폰트 적용 -->
+    <link href="https://fonts.googleapis.com/css2?family=Sunflower:wght@300&display=swap" rel="stylesheet">
 
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -22,23 +26,24 @@
 
 
     <style>
+        * {
+            font-family: 'Sunflower', sans-serif;
+        }
+
          body {
-            background-color: white;
-            min-height: 100vh;
+            background-color: skyblue;
+            height: 1500px;
             padding-top: 3.25rem;
         }
+
         .section {
             padding: 1rem 1.5rem;
             max-width: 750px;
             margin: auto;
             margin-top: 40px;
         }
-        .title {
-            color: black;
-        }
-        .button.is-sparta.is-outlined {
-            margin-right: 340px;
-        }
+
+
         .modal-content {
             width: 600px;
             max-width: 80%;
@@ -46,6 +51,7 @@
         input::-webkit-calendar-picker-indicator {
             display: none;
         }
+
         .image img {
             object-fit: cover;
             width: 100%;
@@ -97,12 +103,21 @@
 
 <body class="has-navbar-fixed-top">
 
-<nav class="navbar is-fixed-top is-info" role="navigation" aria-label="main navigation">
+<nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
         <a class="navbar-item" href="/">
+            <img class="" src="{{ url_for('static', filename='logo.png') }}">
             <strong class="title"
-                    style="font-family:'Stylish', sans-serif; font-size: larger;">그해 우리는 어디에 갔을까?</strong>
+                    style="font-family: 'Stylish', sans-serif;font-size: larger;">그 해 우리는 어디를 갔을까</strong>
         </a>
+    </div>
+    <div class="navbar-end">
+        <div class="navbar-item">
+            <div class="buttons">
+                <a class="button is-link is-outlined" onclick="window.location.href='/'">메인페이지</a>
+                    <a class="button is-link is-outlined" onclick="sign_out()">Log out</a>
+            </div>
+        </div>
     </div>
 </nav>
 
@@ -123,13 +138,9 @@
                     </p>
                 </div>
                 <nav id="btns-me" class="level is-mobile" style="margin-top:2rem">
-                    <button onclick='$("#modal-edit").addClass("is-active")' class="button is-info is-sparta">프로필 수정
+                    <button onclick='$("#modal-edit").addClass("is-active")' class="button is-link is-sparta">프로필 수정
                         &nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-pencil"
                                                                    aria-hidden="true"></i></span>
-                    </button>
-                    <button onclick="sign_out()" class="button is-info is-outlined is-sparta">로그아웃
-                        &nbsp;&nbsp;<span class="icon is-small"><i
-                                class="fa fa-sign-out" aria-hidden="true"></i></span>
                     </button>
                 </nav>
             </div>
