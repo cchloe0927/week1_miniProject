@@ -1,13 +1,12 @@
 * {
-    font-family: 'Nanum Gothic', sans-serif;
     font-family: 'Sunflower', sans-serif;
 }
+
 body {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100vw;
+    background-color: skyblue;
+    padding-top: 3.25rem;
 }
+
 .wrapper {
     flex: 1;
 }
@@ -19,11 +18,6 @@ body {
     font-size: 25px;
 }
 
-img {
-    border: 1px solid black;
-    width: 800px;
-    height: 600px;
-}
 section {
     display: flex;
     flex-direction: column;

@@ -28,7 +28,7 @@ function listing(username) {
                     // 가져온 값들을 원하는 곳에 넣어준다.
                     let temp_html = `<div style="margin:10px 0px 10px 20px; width: 18rem;" class="card" id="${post["_id"]}">
                                                 <div class="pic" >
-                                                    <img style="height: 13rem; object-fit: cover"  src="../static/place_pic/${place_pic}" id="${post["_id"]}" onclick="location.href = '/detail/${num}'">
+                                                    <img style="height: 13rem; width: 20rem; object-fit: cover"  src="../static/place_pic/${place_pic}" id="${post["_id"]}" onclick="location.href = '/detail/${num}'">
                                                          <div class="level-left"><div class="name"> <strong>${profile_name}</strong>&nbsp;<small>${time_before}</small></div>&nbsp;
                                                               <a class="level-item is-sparta" aria-label="heart" onclick="toggle_like('${post['_id']}', 'heart')">
                                                                    <span style="color: red" class="icon is-small"><i class="fa ${class_heart}" aria-hidden="true"></i></span>&nbsp;<span  style="color: red" class="like-num">${num2str(count_heart)}</span>

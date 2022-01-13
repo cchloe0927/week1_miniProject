@@ -8,11 +8,12 @@
     <!-- Bulma CSS 링크 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" href="../static/detail.css">
+
+    <!-- 메인, 상세, 프로필 CSS 임포트 -->
+    <link href="{{ url_for('static', filename='mystyle.css') }}" rel="stylesheet">
+
     <!-- 구글폰트 적용 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Sunflower:wght@300&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sunflower:wght@300&display=swap" rel="stylesheet">
 
     <!-- 폰트어썸 -->
     <script src="https://kit.fontawesome.com/6478f529f2.js" crossorigin="anonymous"></script>
@@ -23,41 +24,90 @@
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-  </head>
+</head>
 
-    <script>
-        $(document).ready(function () {
-            get_likes()
-        })
+<script>
+    $(document).ready(function () {
+        get_likes()
+    })
 
-        function sign_out() {//로그아웃 버튼을 누르면
-            $.removeCookie('mytoken', {path: '/'});//쿠키를 브라우저에서 삭제
-            alert('로그아웃!')
-            window.location.href = "/login"
-        }
-    </script>
+    function sign_out() {//로그아웃 버튼을 누르면
+        $.removeCookie('mytoken', {path: '/'});//쿠키를 브라우저에서 삭제
+        alert('로그아웃!')
+        window.location.href = "/login"
+    }
+
+    //username에 반응하여 게시물을 불러온다.
+    function listing(username) {
+        //서버에서 정보 받아오기 전에 게시물이 담길 공간을 비운다.
+        $("#post-box").empty()
+        $.ajax({
+            type: "GET",
+            //서버에 사용자의 username을 보낸다.
+            url: `/listing?username_give=${username}`,
+            data: {},
+            success: function (response) {
+                if (response["result"] == "success") {
+                    let posts = response['posts']
+                    for (let i = 0; i < posts.length; i++) {
+                        //각 post 에서 필요한 값을 가져온다.
+                        let post = posts[i]
+                        let num = post['num']
+                        let place_pic = post['place_pic']
+                        let profile_name = post['profile_name']
+                        let time_post = new Date(post["date"])
+                        let time_before = time2str(time_post)
+                        //class_heart는 첫번쨰항이 true면 fa-heart이고 false면 fa-heart-o이다.
+                        let class_heart = post['heart_by_me'] ? "fa-heart" : "fa-heart-o"
+                        let count_heart = post['count_heart']
+                        // 가져온 값들을 원하는 곳에 넣어준다.
+                        let temp_html = `<div style="margin:10px 0px 10px 20px; width: 18rem;" class="card" id="${post["_id"]}">
+                                                <div class="pic" >
+                                                    <img style="height: 13rem; width: 20rem; object-fit: cover"  src="../static/place_pic/${place_pic}" id="${post["_id"]}" onclick="location.href = '/detail/${num}'">
+                                                         <div class="level-left"><div class="name"> <strong>${profile_name}</strong>&nbsp;<small>${time_before}</small></div>&nbsp;
+                                                              <a class="level-item is-sparta" aria-label="heart" onclick="toggle_like('${post['_id']}', 'heart')">
+                                                                   <span style="color: red" class="icon is-small"><i class="fa ${class_heart}" aria-hidden="true"></i></span>&nbsp;<span  style="color: red" class="like-num">${num2str(count_heart)}</span>
+                                                              </a>
+                                                         </div>
+                                                    </nav>
+                                                </div>
+                                         </div>`
+                        //게시물이 담길 공간으로 옮긴다.
+                        $('#post-box').append(temp_html)
+                    }
+                }
+            }
+        });
+    }
+
+</script>
 
 
 <body>
 <div class="wrapper">
     <!-- nav bar -->
     <!-- Main container -->
-    <nav class="level">
-        <!-- Left side -->
-        <div class="level-left">
-            <p class="level-item"><i class="fas fa-car-side fa-2x"></i></p>
-            <p class="level-item"><span>그해 우리는...</span></p>
+    <nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img class="" src="{{ url_for('static', filename='logo.png') }}">
+                <strong class="title"
+                        style="font-family: 'Stylish', sans-serif;font-size: larger;">그 해 우리는 어디를 갔을까</strong>
+            </a>
         </div>
-
-        <!-- Right side -->
-        <div class="level-right">
-            <p class="level-item"><a onclick="window.location.href='/'">메인페이지</a></p>
-            <p class="level-item"><a onclick="sign_out()">로그아웃</a></p>
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-link is-outlined" onclick="window.location.href='/'">메인페이지</a>
+                    <a class="button is-link is-outlined" onclick="sign_out()">Log out</a>
+                </div>
+            </div>
         </div>
     </nav>
     <!-- 사진부분 -->
     <section class="section" id="pic-box">
-        <img src="../static/place_pic/{{ search_post['place_pic'] }}">
+        <img style="border: 1px solid black; width: 800px; height: 600px;"
+             src="../static/place_pic/{{ search_post['place_pic'] }}">
         <div id="like-box"></div>
         <p class="show_like">{{ search_post['profile_name'] }} </p>
         <p class="show_comment">comment : {{ search_post['contents'] }}</p>

@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <!-- Font Awesome CSS -->
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 메인, 상세, 프로필 CSS 임포트 -->
+    <link href="{{ url_for('static', filename='mystyle.css') }}" rel="stylesheet">
+    <!-- 구글폰트 적용 -->
+    <link href="https://fonts.googleapis.com/css2?family=Sunflower:wght@300&display=swap" rel="stylesheet">
 
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -22,56 +26,67 @@
     <script src="{{ url_for('static', filename='myjs.js') }}"></script>
 
 
-  <style>
+    <style>
+        * {
+            font-family: 'Sunflower', sans-serif;
+        }
+
         body {
-            background-color: skyblue;
-            min-height: 100vh;
+            height: 1500px;
+            background-color: skyblue;;
             padding-top: 3.25rem;
         }
+
         .section {
             padding: 1rem 1.5rem;
             max-width: 1000px;
             margin: auto;
         }
+
         .is-sparta {
             color: #05899d !important;
         }
+
         .button.is-sparta {
             background-color: #05899d;
             border-color: transparent;
             color: #fff !important;
         }
+
         .button.is-sparta.is-outlined {
             background-color: transparent;
             border-color: #05899d;
             color: #05899d !important;
         }
+
         .modal-content {
             width: 600px;
             max-width: 80%;
         }
+
         input::-webkit-calendar-picker-indicator {
             display: none;
         }
+
         .image img {
             object-fit: cover;
             width: 100%;
             height: 100%;
         }
+
         .card {
             padding: 10px;
-            display: flex;    /*가로 정렬*/
-            flex-wrap: wrap;  /*정렬 된 요소들의 총 넓이가 부모 넓이 보다 클 때 이 요소들을 다음 중에 이어서 나열해주는 기능*/
-            float: left;      /*왼쪽 부터 나열*/
+            display: flex; /*가로 정렬*/
+            flex-wrap: wrap; /*정렬 된 요소들의 총 넓이가 부모 넓이 보다 클 때 이 요소들을 다음 중에 이어서 나열해주는 기능*/
+            float: left; /*왼쪽 부터 나열*/
         }
-       .container {
-           width: 1000px;
-           margin-top: 50px;
-       }
 
-
-
+        .container {
+            width: 1000px;
+            margin-top: 50px;
+        }
     </style>
+
     <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
     <script>
         // 페이지를 불러오면서 게시물도 바로 불러온다.
@@ -115,32 +130,30 @@
     <div class="navbar-brand">
         <a class="navbar-item" href="/">
             <img class="" src="{{ url_for('static', filename='logo.png') }}">
-            <strong class="is-sparta"
+            <strong class="title"
                     style="font-family: 'Stylish', sans-serif;font-size: larger;">그 해 우리는 어디를 갔을까</strong>
         </a>
     </div>
     <div class="navbar-end">
         <div class="navbar-item">
             <div class="buttons">
-<!--게시물 작성 버튼-->
-                <a class="button is-primary" onclick='$("#modal-post").addClass("is-active")'>
-                    <strong>+</strong>
-                </a>
-
-<!-- userpage 로 이동하는 버튼-->
-                <a class="button is-light" onclick="location.href = '/user/{{ user_info.username }}'">
-                    My profile
-                </a>
-<!--               로그아웃 버튼-->
-                <a class="button is-light" onclick="sign_out()">
-                    Log out
-                </a>
+                <!--게시물 작성 버튼-->
+                    <a class="button is-link" onclick='$("#modal-post").addClass("is-active")'>
+                        <strong>+</strong>
+                    </a>
+                    <a class="button is-link is-outlined" onclick="location.href = '/user/{{ user_info.username }}'">
+                        My profile
+                    </a>
+                    <a class="button is-link is-outlined" onclick="sign_out()">
+                        Log out
+                    </a></a>
             </div>
         </div>
     </div>
+    </div>
 </nav>
 <section>
-<!--    게시물 작성버튼을 눌렀을 시 작동되는 게시물작성용 모달-->
+    <!--    게시물 작성버튼을 눌렀을 시 작동되는 게시물작성용 모달-->
     <div class="modal" id="modal-post">
         <div class="modal-background" onclick='$("#modal-post").removeClass("is-active")'></div>
         <div class="modal-content">

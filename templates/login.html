@@ -93,6 +93,12 @@
         background-repeat: no-repeat;
         background-size: cover;
     }
+
+    .text-placeholder {
+        font-size: 24px;
+        text-align: center;
+        margin: auto;
+    }
 </style>
 <body>
 <div class="main-container container">
@@ -103,13 +109,15 @@
                     <div class="content-placeholder">
                         <div class="image-container is-hidden-mobile">
                             <div class="image">
-                                <h1>당신의 여행 기록 보관소</h1>
+                                <h1 class="text-placeholder">그해 우리는..</h1>
+
+                                
                             </div>
                         </div>
                         <div class="login-container container">
                             <div>
                                 <div>
-                                    <img src= {{ url_for('static', filename='logo.png') }}/>
+                                    <img src= {{ url_for( 'static', filename='logo.png') }}/>
                                 </div>
                                 <div class="container">
                                     <div style="max-width: 480px;margin:auto">
