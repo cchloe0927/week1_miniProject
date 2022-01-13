@@ -40,6 +40,6 @@ ___
 + 프로필 화면
 ![스크린샷 2022-01-13 오후 6 47 26](https://user-images.githubusercontent.com/82128525/149308263-e303b166-a2b0-4f6a-8c7d-c1a097cf5cfa.png)
 
-+ 프로필 화면
++  화면
 ![스크린샷 2022-01-13 오후 6 48 14](https://user-images.githubusercontent.com/82128525/149308570-cb14209b-3042-4d87-ba5d-1a1d8176b784.png)
 
